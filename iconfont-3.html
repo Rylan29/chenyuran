@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<!--
+  iconfont-3.html — 移动端底部导航演示（Font Awesome 字体图标方案）
+  依赖：cdn/fontawesome/css/all.min.css + cdn/fontawesome/webfonts/（本地化，离线可用）
+  资源版本：Font Awesome 6.5.2（cdnjs）
+  说明：固定底部 TabBar，4 项 flex 等宽自适应；「消息」数字徽章，「购物车」红点
+-->
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>底部导航演示 · 字体图标</title>
+  <link rel="stylesheet" href="cdn/fontawesome/css/all.min.css">
+  <style>
+    /* ---------------- 变量 ---------------- */
+    :root {
+      --cyr_color-bg: #fff9c4;
+      --cyr_color-card: #ffffff;
+      --cyr_color-active: #2196f3;
+      --cyr_color-tab-inactive: #8d7b6b;
+      --cyr_color-badge: #f44336;
+      --cyr_color-text: #4e342e;
+      --cyr_color-text-muted: #8d7b6b;
+      --cyr_color-divider: rgba(78, 52, 46, 0.12);
+      --cyr_tabbar-height: 56px;
+    }
+
+    /* ---------------- 基础 ---------------- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+      background-color: var(--cyr_color-bg);
+      color: var(--cyr_color-text);
+    }
+
+    /* ---------------- 顶部标题栏 ---------------- */
+    .cyr_page-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--cyr_color-divider);
+      background-color: var(--cyr_color-card);
+    }
+
+    .cyr_page-title {
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .cyr_back-link {
+      color: var(--cyr_color-text);
+      font-size: 13px;
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    .cyr_back-link:hover {
+      color: var(--cyr_color-active);
+      text-decoration: underline;
+    }
+
+    .cyr_back-link:focus-visible,
+    .cyr_tabbar__item:focus-visible {
+      outline: 3px solid rgba(33, 150, 243, 0.4);
+      outline-offset: 2px;
+      border-radius: 4px;
+    }
+
+    /* ---------------- 内容占位区 ---------------- */
+    /* 底部 padding 预留出固定导航高度 + 安全区，保证最后一张卡片不被遮挡 */
+    .cyr_content {
+      padding: 16px 16px calc(var(--cyr_tabbar-height) + env(safe-area-inset-bottom, 0px) + 16px);
+    }
+
+    .cyr_card {
+      background-color: var(--cyr_color-card);
+      border-radius: 12px;
+      padding: 20px 16px;
+      margin-bottom: 16px;
+      font-size: 14px;
+      line-height: 1.6;
+      box-shadow: 0 1px 4px rgba(78, 52, 46, 0.08);
+    }
+
+    /* ---------------- 底部导航 ---------------- */
+    .cyr_tabbar {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: flex;
+      /* 安全区：高度随底部圆角条扩展，内容仍为 56px */
+      height: calc(var(--cyr_tabbar-height) + env(safe-area-inset-bottom, 0px));
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+      background-color: var(--cyr_color-card);
+      border-top: 1px solid var(--cyr_color-divider);
+    }
+
+    .cyr_tabbar__item {
+      flex: 1 1 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      color: var(--cyr_color-tab-inactive);
+      text-decoration: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .cyr_tabbar__item--active {
+      color: var(--cyr_color-active);
+    }
+
+    /* 图标外层容器：角标的定位参照 */
+    .cyr_tabbar__icon-wrap {
+      position: relative;
+      line-height: 1;
+    }
+
+    .cyr_icon {
+      font-size: 22px;
+      /* FA 使用 currentColor，随所在导航项的激活态变色 */
+    }
+
+    .cyr_tabbar__label {
+      font-size: 11px;
+    }
+
+    /* ---------------- 角标 ---------------- */
+    .cyr_badge {
+      position: absolute;
+      top: -6px;
+      right: -12px;
+      min-width: 16px;
+      height: 16px;
+      padding: 0 4px;
+      border-radius: 999px;
+      background-color: var(--cyr_color-badge);
+      color: #ffffff;
+      font-size: 10px;
+      line-height: 16px;
+      text-align: center;
+      font-style: normal;
+    }
+
+    .cyr_badge--dot {
+      top: -2px;
+      right: -6px;
+      min-width: 8px;
+      width: 8px;
+      height: 8px;
+      padding: 0;
+    }
+  </style>
+</head>
+<body>
+  <header class="cyr_page-header">
+    <h1 class="cyr_page-title">底部导航演示 · 字体图标</h1>
+    <a class="cyr_back-link" href="index.html">← 返回首页</a>
+  </header>
+
+  <!-- 内容占位：4 张卡片保证可滚动，用于验证固定导航 -->
+  <main class="cyr_content">
+    <section class="cyr_card">占位卡片 1 —— 缩窄窗口体验移动端布局：底部 4 个导航项自适应等宽，随滚动固定不动。</section>
+    <section class="cyr_card">占位卡片 2 —— 「消息」图标右上角是数字徽章（8），多位数时徽章宽度自适应撑开。</section>
+    <section class="cyr_card">占位卡片 3 —— 「购物车」图标右上角是 8px 红点，用于提示无需数字的未读状态。</section>
+    <section class="cyr_card">占位卡片 4 —— 「首页」为蓝色激活态演示。本页图标由 Font Awesome 字体渲染。</section>
+  </main>
+
+  <!-- 固定底部导航：4 项 flex 等宽 -->
+  <nav class="cyr_tabbar" aria-label="底部导航">
+    <a class="cyr_tabbar__item cyr_tabbar__item--active" href="#" aria-current="page">
+      <span class="cyr_tabbar__icon-wrap">
+        <i class="fa-solid fa-house cyr_icon" aria-hidden="true"></i>
+      </span>
+      <span class="cyr_tabbar__label">首页</span>
+    </a>
+    <a class="cyr_tabbar__item" href="#">
+      <span class="cyr_tabbar__icon-wrap">
+        <i class="fa-solid fa-comment-dots cyr_icon" aria-hidden="true"></i>
+        <span class="cyr_badge">8</span>
+      </span>
+      <span class="cyr_tabbar__label">消息</span>
+    </a>
+    <a class="cyr_tabbar__item" href="#">
+      <span class="cyr_tabbar__icon-wrap">
+        <i class="fa-solid fa-cart-shopping cyr_icon" aria-hidden="true"></i>
+        <span class="cyr_badge cyr_badge--dot" aria-hidden="true"></span>
+      </span>
+      <span class="cyr_tabbar__label">购物车</span>
+    </a>
+    <a class="cyr_tabbar__item" href="#">
+      <span class="cyr_tabbar__icon-wrap">
+        <i class="fa-solid fa-user cyr_icon" aria-hidden="true"></i>
+      </span>
+      <span class="cyr_tabbar__label">我的</span>
+    </a>
+  </nav>
+</body>
+</html>

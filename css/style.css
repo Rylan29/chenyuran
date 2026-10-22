@@ -1,0 +1,227 @@
+/* ==========================================================================
+   抓小球小游戏 — 样式表
+   命名约定：所有类名以 cyr_ 开头；CSS 自定义属性以 --cyr_ 开头。
+   组织顺序：设计变量 → 基础重置 → 顶部状态栏 → 游戏区 → 公共遮罩层 → 引导层
+             → 通用按钮 → 结算面板 → 响应式适配
+   ========================================================================== */
+
+/* 设计变量：统一管理配色与关键尺寸 */
+:root {
+  --cyr_color-bg: #fff9c4;
+  --cyr_color-ball: #2196f3;
+  --cyr_color-button-hover: #1976d2;
+  --cyr_color-text: #4e342e;
+  --cyr_color-text-muted: #8d7b6b;
+  --cyr_color-divider: rgba(78, 52, 46, 0.12);
+  --cyr_status-bar-height: 64px;
+  --cyr_ball-size: 60px;
+}
+
+/* 基础重置 */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* 统一保证 hidden 属性生效：避免 display:flex 等声明覆盖浏览器默认隐藏行为 */
+[hidden] {
+  display: none !important;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+/* 移动端地址栏伸缩时，动态视口单位更贴近真实可视区域（不支持的内核自动忽略上一条回退） */
+@supports (height: 100dvh) {
+  html,
+  body {
+    height: 100dvh;
+  }
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background-color: var(--cyr_color-bg);
+  color: var(--cyr_color-text);
+  font-family: "Microsoft YaHei", "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+  /* 触屏设备上去掉系统点击高亮，避免快速连点时的闪烁干扰 */
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 顶部状态栏 */
+.cyr_status-bar {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--cyr_status-bar-height);
+  padding: 0 24px;
+  border-bottom: 1px solid var(--cyr_color-divider);
+}
+
+.cyr_status-bar__score {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.cyr_status-bar__timer {
+  font-size: 20px;
+  font-weight: 600;
+  /* 等宽数字，避免秒数变化时文本宽度抖动 */
+  font-variant-numeric: tabular-nums;
+}
+
+/* 游戏区：占据状态栏之外的剩余视口，小球只在此区域内出现 */
+.cyr_game-area {
+  position: relative;
+  flex: 1 1 auto;
+  overflow: hidden;
+  touch-action: manipulation;
+  user-select: none;
+}
+
+/* 小球：绝对定位于游戏区内，left/top 由 JS 计算 */
+.cyr_ball {
+  position: absolute;
+  width: var(--cyr_ball-size);
+  height: var(--cyr_ball-size);
+  border-radius: 50%;
+  background-color: var(--cyr_color-ball);
+}
+
+/* 出现/换位动画：缩放 + 淡入；JS 通过增删该类重新触发 */
+.cyr_ball--in {
+  animation: cyr_ball-in 0.2s ease-out;
+}
+
+@keyframes cyr_ball-in {
+  from {
+    transform: scale(0.4);
+    opacity: 0;
+  }
+
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* 公共遮罩层：引导层与结算面板共用的覆盖式居中布局 */
+.cyr_overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  text-align: center;
+}
+
+/* 引导层：开始前居中展示引导文案与开始按钮 */
+.cyr_guide {
+  gap: 20px;
+}
+
+.cyr_guide__text {
+  font-size: 18px;
+  color: var(--cyr_color-text-muted);
+}
+
+/* 图标演示页入口：位于引导层内，随引导层显隐 */
+.cyr_icon-nav {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+}
+
+.cyr_icon-nav__link {
+  /* 用正文深色而非 muted 色，保证 14px 小字在浅黄底上的对比度达标 */
+  color: var(--cyr_color-text);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.cyr_icon-nav__link:hover {
+  color: var(--cyr_color-ball);
+  text-decoration: underline;
+}
+
+.cyr_icon-nav__link:focus-visible {
+  outline: 3px solid rgba(33, 150, 243, 0.4);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* 通用按钮：开始游戏与重新开始共用 */
+.cyr_btn {
+  min-width: 160px;
+  min-height: 44px;
+  padding: 12px 32px;
+  border: none;
+  border-radius: 999px;
+  background-color: var(--cyr_color-ball);
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.cyr_btn:hover {
+  background-color: var(--cyr_color-button-hover);
+}
+
+.cyr_btn:active {
+  transform: scale(0.96);
+}
+
+.cyr_btn:focus-visible {
+  outline: 3px solid rgba(33, 150, 243, 0.4);
+  outline-offset: 2px;
+}
+
+/* 结算面板：覆盖在游戏区之上，展示最终分数 */
+.cyr_result-panel {
+  gap: 16px;
+  background-color: rgba(255, 249, 196, 0.92);
+}
+
+.cyr_result-panel__label {
+  font-size: 18px;
+  color: var(--cyr_color-text-muted);
+}
+
+.cyr_result-panel__score {
+  font-size: 48px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* 窄屏适配：收紧状态栏留白与字号，保证不溢出、不重叠 */
+@media (max-width: 480px) {
+  :root {
+    --cyr_status-bar-height: 56px;
+  }
+
+  .cyr_status-bar {
+    padding: 0 16px;
+  }
+
+  .cyr_status-bar__score,
+  .cyr_status-bar__timer {
+    font-size: 18px;
+  }
+
+  .cyr_btn {
+    width: 100%;
+    max-width: 240px;
+  }
+}

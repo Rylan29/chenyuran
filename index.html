@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>抓小球小游戏</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- 顶部状态栏：左侧实时分数，右侧剩余时间 -->
+  <header class="cyr_status-bar">
+    <span class="cyr_status-bar__score" id="cyr_score-display">分数：0</span>
+    <span class="cyr_status-bar__timer" id="cyr_timer-display">2:00</span>
+  </header>
+
+  <main class="cyr_game-area" id="cyr_game-area">
+    <!-- 小球：位置由 JS 计算，出现/换位时播放缩放淡入动画 -->
+    <div class="cyr_ball" id="cyr_ball" hidden></div>
+
+    <!-- 未开始状态：引导文案与开始按钮 -->
+    <div class="cyr_overlay cyr_guide" id="cyr_guide">
+      <p class="cyr_guide__text">点击开始按钮，2 分钟挑战开始</p>
+      <button class="cyr_btn" id="cyr_start-button" type="button">开始游戏</button>
+      <!-- 图标演示页入口：随引导层显隐，游戏中不出现 -->
+      <nav class="cyr_icon-nav" aria-label="图标演示页入口">
+        <a class="cyr_icon-nav__link" href="iconfont-1.html">字体图标演示</a>
+        <span class="cyr_icon-nav__divider" aria-hidden="true">|</span>
+        <a class="cyr_icon-nav__link" href="iconfont-2.html">SVG 图标演示</a>
+      </nav>
+    </div>
+
+    <!-- 结算面板：默认隐藏，时间到时展示最终分数 -->
+    <section class="cyr_overlay cyr_result-panel" id="cyr_result-panel" hidden>
+      <p class="cyr_result-panel__label">最终分数</p>
+      <p class="cyr_result-panel__score" id="cyr_final-score">0</p>
+      <button class="cyr_btn" id="cyr_restart-button" type="button">重新开始</button>
+    </section>
+  </main>
+
+  <script src="js/game.js"></script>
+</body>
+</html>

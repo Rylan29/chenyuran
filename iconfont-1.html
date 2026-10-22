@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Font Awesome 字体图标演示</title>
+  <!--
+    模块二 · 任务 i2：Font Awesome 字体图标演示页
+    技术方案：Font Awesome Free 6.5.2（字体图标 / icon font），资源已本地化，离线可用
+    本地资源：cdn/fontawesome/css/all.min.css + cdn/fontawesome/webfonts/*
+    命名约定：自写类名 / id 一律以 cyr_ 开头；fa-* 为第三方库专用类名，保持原样不改
+    编写日期：2026-10-22
+  -->
+  <link rel="stylesheet" href="cdn/fontawesome/css/all.min.css">
+  <style>
+    /* 设计变量：统一管理配色 */
+    :root {
+      --cyr_color-bg: #fff9c4;
+      --cyr_color-card: #ffffff;
+      --cyr_color-icon: #2196f3;
+      --cyr_color-text: #4e342e;
+      --cyr_color-text-muted: #8d7b6b;
+      --cyr_color-divider: rgba(78, 52, 46, 0.12);
+    }
+
+    /* 基础重置 */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      background-color: var(--cyr_color-bg);
+      color: var(--cyr_color-text);
+      font-family: "Microsoft YaHei", "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* 页首：标题与返回首页链接 */
+    .cyr_page-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--cyr_color-divider);
+    }
+
+    .cyr_page-title {
+      font-size: 22px;
+    }
+
+    .cyr_back-link {
+      color: var(--cyr_color-icon);
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .cyr_back-link:hover {
+      text-decoration: underline;
+    }
+
+    /* 图标网格：卡片自适应排列（CSS Grid） */
+    .cyr_icon-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 16px;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .cyr_icon-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      padding: 20px 12px;
+      background-color: var(--cyr_color-card);
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(78, 52, 46, 0.08);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .cyr_icon-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 14px rgba(78, 52, 46, 0.14);
+    }
+
+    /* 字体图标本体：字号决定图标大小（字体图标的技术特点）；cyr_icon 自有修饰类，避免直接以库类作选择器 */
+    .cyr_icon {
+      font-size: 32px;
+      color: var(--cyr_color-icon);
+    }
+
+    .cyr_icon-name {
+      font-size: 13px;
+      color: var(--cyr_color-text-muted);
+      text-align: center;
+      overflow-wrap: anywhere;
+    }
+
+    /* 页脚：技术说明 */
+    .cyr_page-footer {
+      padding: 16px 24px 32px;
+      font-size: 13px;
+      color: var(--cyr_color-text-muted);
+      text-align: center;
+    }
+
+    /* 窄屏适配 */
+    @media (max-width: 480px) {
+      .cyr_page-header {
+        padding: 12px 16px;
+      }
+
+      .cyr_page-title {
+        font-size: 18px;
+      }
+
+      .cyr_icon-grid {
+        grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+        padding: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="cyr_page-header">
+    <h1 class="cyr_page-title">Font Awesome 字体图标演示</h1>
+    <a class="cyr_back-link" href="index.html">← 返回首页</a>
+  </header>
+
+  <main>
+    <section class="cyr_icon-grid" aria-label="Font Awesome 图标列表">
+      <figure class="cyr_icon-card">
+        <i class="fa-solid fa-house cyr_icon" aria-hidden="true"></i>
+        <figcaption class="cyr_icon-name">house · 首页</figcaption>
+      </figure>
+      <figure class="cyr_icon-card">
+        <i class="fa-solid fa-user cyr_icon" aria-hidden="true"></i>
+        <figcaption class="cyr_icon-name">user · 用户</figcaption>
+      </figure>
+      <figure class="cyr_icon-card">
+        <i class="fa-solid fa-magnifying-glass cyr_icon" aria-hidden="true"></i>
+        <figcaption class="cyr_icon-name">magnifying-glass · 搜索</figcaption>
+      </figure>
+      <figure class="cyr_icon-card">
+        <i class="fa-solid fa-gear cyr_icon" aria-hidden="true"></i>
+        <figcaption class="cyr_icon-name">gear · 设置</figcaption>
+      </figure>
+      <figure class="cyr_icon-card">
+        <i class="fa-solid fa-heart cyr_icon" aria-hidden="true"></i>
+        <figcaption class="cyr_icon-name">heart · 喜欢</figcaption>
+      </figure>
+      <figure class="cyr_icon-card">
+        <i class="fa-solid fa-star cyr_icon" aria-hidden="true"></i>
+        <figcaption class="cyr_icon-name">star · 收藏</figcaption>
+      </figure>
+      <figure class="cyr_icon-card">
+        <i class="fa-solid fa-bell cyr_icon" aria-hidden="true"></i>
+        <figcaption class="cyr_icon-name">bell · 通知</figcaption>
+      </figure>
+      <figure class="cyr_icon-card">
+        <i class="fa-solid fa-envelope cyr_icon" aria-hidden="true"></i>
+        <figcaption class="cyr_icon-name">envelope · 邮件</figcaption>
+      </figure>
+      <figure class="cyr_icon-card">
+        <i class="fa-solid fa-camera cyr_icon" aria-hidden="true"></i>
+        <figcaption class="cyr_icon-name">camera · 相机</figcaption>
+      </figure>
+      <figure class="cyr_icon-card">
+        <i class="fa-solid fa-download cyr_icon" aria-hidden="true"></i>
+        <figcaption class="cyr_icon-name">download · 下载</figcaption>
+      </figure>
+      <figure class="cyr_icon-card">
+        <i class="fa-solid fa-trash-can cyr_icon" aria-hidden="true"></i>
+        <figcaption class="cyr_icon-name">trash-can · 删除</figcaption>
+      </figure>
+      <figure class="cyr_icon-card">
+        <i class="fa-solid fa-music cyr_icon" aria-hidden="true"></i>
+        <figcaption class="cyr_icon-name">music · 音乐</figcaption>
+      </figure>
+    </section>
+  </main>
+
+  <footer class="cyr_page-footer">
+    技术方案：Font Awesome Free 6.5.2 字体图标（icon font）—— CSS 通过 @font-face 加载本地 webfonts 字体文件，图标以字体字符渲染，可通过 font-size / color 直接控制，断网可用。
+  </footer>
+</body>
+</html>
