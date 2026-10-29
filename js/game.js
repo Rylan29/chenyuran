@@ -48,6 +48,8 @@
     cyr_startButton.addEventListener('click', cyr_startGame);
     cyr_restartButton.addEventListener('click', cyr_resetGame);
     document.addEventListener('visibilitychange', cyr_handleVisibilityChange);
+    // 事件委托：所有游戏区内点击经此分流（T5 点球得分 / T6 点空白扣分）
+    cyr_gameArea.addEventListener('click', cyr_handleAreaClick);
     cyr_updateHud();
   }
 
@@ -116,6 +118,11 @@
     cyr_resultPanel.hidden = true;
     cyr_guide.hidden = false;
 
+    // 清掉残留飘字：防止 reset 后 0.7s 动画未播完的旧飘字短暂出现在新游戏
+    cyr_gameArea.querySelectorAll('.cyr_score-popup').forEach(function cyr_cleanPopups(cyr_popup) {
+      cyr_popup.remove();
+    });
+
     cyr_updateHud();
   }
 
@@ -162,6 +169,66 @@
     cyr_ball.classList.remove('cyr_ball--in');
     void cyr_ball.offsetWidth;
     cyr_ball.classList.add('cyr_ball--in');
+  }
+
+  /* ---------------- T5 / T6 事件委托 ---------------- */
+  // 游戏区内点击统一入口：首行状态守卫，target 分流到 T5 点球 / T6 点空白
+  function cyr_handleAreaClick(event) {
+    // 只有游戏进行中才处理，结算与引导层点击一律忽略（含重新开始按钮冒泡）
+    if (cyr_gameState !== CYR_STATE.RUNNING) {
+      return;
+    }
+
+    if (event.target === cyr_ball) {
+      cyr_onBallHit();
+    } else {
+      cyr_onMiss(event);
+    }
+  }
+
+  // 点中球：+2、换位、飘字
+  function cyr_onBallHit() {
+    cyr_score += 2;
+    cyr_updateHud();
+
+    // 飘字定位用球当前的 offsetLeft/offsetTop（换位前取值，保证飘字在原地而非新位置）
+    const cyr_popX = cyr_ball.offsetLeft + CYR_BALL_SIZE / 2;
+    const cyr_popY = cyr_ball.offsetTop;
+    cyr_spawnScorePopup('+2', cyr_popX, cyr_popY, false);
+
+    cyr_spawnBall();
+  }
+
+  // 点空白：−1、球不动、红色飘字
+  function cyr_onMiss(event) {
+    cyr_score -= 1;
+    cyr_updateHud();
+
+    // 飘字定位用点击坐标（相对 game-area）：clientX/Y 减去 game-area 自身偏移
+    const cyr_gameAreaRect = cyr_gameArea.getBoundingClientRect();
+    const cyr_popX = event.clientX - cyr_gameAreaRect.left;
+    const cyr_popY = event.clientY - cyr_gameAreaRect.top;
+    cyr_spawnScorePopup('-1', cyr_popX, cyr_popY, true);
+  }
+
+  // 创建得分飘字：动画结束后自动从 DOM 移除，避免累积
+  // cyr_isMiss 区分命中（蓝色 +2）与未命中（红色 −1），CSS 用 --miss 变体覆盖颜色
+  function cyr_spawnScorePopup(cyr_text, cyr_centerX, cyr_centerY, cyr_isMiss) {
+    const cyr_popup = document.createElement('span');
+    cyr_popup.className = 'cyr_score-popup' + (cyr_isMiss ? ' cyr_score-popup--miss' : '');
+    cyr_popup.textContent = cyr_text;
+
+    // 相对游戏区定位：left/top 坐标由 JS 直接写入，水平居中由 CSS 的 translateX(-50%) 实现
+    cyr_popup.style.left = cyr_centerX + 'px';
+    cyr_popup.style.top = cyr_centerY + 'px';
+
+    // 动画结束后移除节点（比 setTimeout 更可靠：动画时长改了不会失同步）
+    cyr_popup.addEventListener('animationend', function cyr_removePopup() {
+      cyr_popup.removeEventListener('animationend', cyr_removePopup);
+      cyr_popup.remove();
+    });
+
+    cyr_gameArea.appendChild(cyr_popup);
   }
 
   /* ---------------- 状态栏刷新 ---------------- */

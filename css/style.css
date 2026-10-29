@@ -10,6 +10,8 @@
   --cyr_color-bg: #fff9c4;
   --cyr_color-ball: #2196f3;
   --cyr_color-button-hover: #1976d2;
+  --cyr_color-popup-hit: #2196f3;
+  --cyr_color-popup-miss: #e53935;
   --cyr_color-text: #4e342e;
   --cyr_color-text-muted: #8d7b6b;
   --cyr_color-divider: rgba(78, 52, 46, 0.12);
@@ -108,6 +110,40 @@ body {
   to {
     transform: scale(1);
     opacity: 1;
+  }
+}
+
+/* 得分飘字：相对游戏区定位，水平居中于球的中心，向上飘出并淡出 */
+.cyr_score-popup {
+  position: absolute;
+  /* JS 写入 left = 球中心横坐标，用 -50% 修正自身宽度，实现水平居中 */
+  transform: translateX(-50%);
+  color: var(--cyr_color-popup-hit);
+  font-size: 24px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+  user-select: none;
+  animation: cyr_score-pop 0.7s ease-out forwards;
+  /* 让飘字始终在球之上，避免球换位后飘字被新球遮挡 */
+  z-index: 10;
+}
+
+/* 点空白扣分飘字：红色，视觉上与命中的蓝色区分 */
+.cyr_score-popup--miss {
+  color: var(--cyr_color-popup-miss);
+}
+
+@keyframes cyr_score-pop {
+  0% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  100% {
+    opacity: 0;
+    /* 向上飘 36px：一个合理的视觉距离，不会飘太远也不会看不出 */
+    transform: translateX(-50%) translateY(-36px);
   }
 }
 
