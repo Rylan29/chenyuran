@@ -1,0 +1,49 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body{
+    padding-bottom: 64px;
+    background-color: #f7f7f7;
+}
+.content{
+    height: 100vh;
+}
+.bottom-nav{
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 64px;
+    background: #ffffff;
+    display: flex;
+    border-top: 1px solid #e5e5e5;
+}
+.nav-item{
+    flex: 1;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    color:#999999;
+    /* 关键修复 */
+    cursor: pointer;   /* 鼠标放上去变成小手 */
+    pointer-events: auto; /* 强制开启点击事件 */
+}
+.nav-icon{
+    width: 24px;
+    height: 24px;
+    fill: currentColor;
+    margin-bottom: 4px;
+    /* svg也允许点击 */
+    pointer-events: none;
+}
+.nav-text{
+    font-size: 12px;
+}
+.nav-item.active{
+    color:#00a4ff;
+}

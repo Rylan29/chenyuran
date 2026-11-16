@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://at.alicdn.com/t/c/font_5238938_y91rpnlle7.js"></script>
+    <link rel="stylesheet" href="./svg004.css">
+</head>
+<body>
+    <div class="page-shell">
+        <a class="back-link" href="./index.html">返回首页</a>
+        <h2>SVG图标</h2>
+    </div>
+    <div class="tab-nav">
+        <div class="tab-item active" onclick="changeTab(this)">
+            <svg class="icon" aria-hidden="true">
+                <use xlink:href="#icon-browser"></use>
+            </svg>
+            <span>浏览器</span>
+        </div>
+        <div class="tab-item" onclick="changeTab(this)">
+            <svg class="icon" aria-hidden="true">
+                <use xlink:href="#icon-love"></use>
+            </svg>
+            <span>关注</span>
+        </div>
+        <div class="tab-item" onclick="changeTab(this)">
+            <svg class="icon" aria-hidden="true">
+                <use xlink:href="#icon-nav"></use>
+            </svg>
+            <span>分享</span>
+        </div>
+        <div class="tab-item" onclick="changeTab(this)">
+            <svg class="icon" aria-hidden="true">
+                <use xlink:href="#icon-positioning"></use>
+            </svg>
+            <span>定位</span>
+        </div>
+    </div>
+     <script>
+        function changeTab(current) {
+            var items = document.querySelectorAll('.tab-item')
+            for (var i = 0; i < items.length; i++) {
+                items[i].classList.remove('active')
+            }
+            current.classList.add('active')
+        }
+    </script>
+</body>
+</html>

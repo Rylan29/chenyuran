@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>提示词工程 · 两轮对照 · Swiper 任务一</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;background:#f5f7fb;color:#1f2937;line-height:1.7}
+.wrap{max-width:1100px;margin:0 auto;padding:40px 20px 60px}
+
+/* 顶部导航条 */
+.top-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.top-bar .brand{display:flex;align-items:center;gap:10px;font-weight:bold;color:#0f2b5b;font-size:15px}
+.top-bar .brand .logo{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#0f2b5b,#1d5bbf);color:#fff;display:flex;align-items:center;justify-content:center;font-size:15px}
+.top-bar .back{color:#6b7280;font-size:14px;text-decoration:none}
+.top-bar .back:hover{color:#0f2b5b}
+
+/* 标题 */
+h1{font-size:26px;color:#111827;margin-bottom:6px}
+.subtitle{color:#6b7280;font-size:14.5px;margin-bottom:28px}
+
+/* 说明横幅 */
+.banner{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 22px;margin-bottom:28px;font-size:14px;color:#4b5563}
+.banner b{color:#0f2b5b}
+
+/* 两栏并排 */
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-bottom:40px}
+
+/* 每张对照卡 */
+.card{background:#fff;border:1px solid #e5e7eb;border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
+.card-head{padding:18px 22px 0 22px}
+.card-head .row{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.card-head .round-no{color:#9ca3af;font-size:13px;font-weight:600}
+.card-head .badge{font-size:12px;padding:3px 10px;border-radius:999px;border:1px solid}
+.card-bad .badge{background:#fef3c7;color:#b45309;border-color:#fde68a}
+.card-good .badge{background:#dcfce7;color:#15803d;border-color:#86efac}
+.card-head h2{font-size:16px;color:#111827;margin-bottom:8px}
+.card-head p{font-size:13.5px;color:#6b7280;line-height:1.75}
+
+/* Swiper 演示区 */
+.demo{margin-top:14px}
+.demo .swiper{border-radius:0}
+.demo .swiper-slide{position:relative;height:220px}
+.demo .swiper-slide img{width:100%;height:100%;object-fit:cover;display:block}
+.demo .cap{position:absolute;left:0;right:0;bottom:0;padding:26px 14px 10px;color:#fff;background:linear-gradient(transparent,rgba(5,15,35,.82))}
+.demo .cap h3{font-size:15px}
+.demo .cap p{font-size:12px;color:#dbe6f8;margin-top:2px}
+.demo .swiper-pagination-bullet{background:#0f2b5b;opacity:.4}
+.demo .swiper-pagination-bullet-active{background:#e8890c;opacity:1}
+
+/* 卡底提示 */
+.tip{padding:14px 22px;font-size:13px;border-top:1px dashed #e5e7eb;margin-top:auto}
+.card-bad .tip{color:#b45309;background:#fffbeb}
+.card-good .tip{color:#15803d;background:#f0fdf4}
+.tip .arrow{margin-right:4px}
+.tip b{font-size:13.5px}
+
+/* 代码块 */
+.code-box{background:#1e293b;color:#e2e8f0;font-family:Consolas,"Fira Code",monospace;font-size:12.5px;padding:16px 20px;line-height:1.7;margin-top:10px;border-radius:10px;border-top-left-radius:0;border-top-right-radius:0;overflow-x:auto;flex:none}
+.code-box .kw{color:#c084fc}   /* 关键字 */
+.code-box .str{color:#86efac}  /* 字符串 */
+.code-box .cm{color:#64748b}   /* 注释 */
+.code-box .f{color:#60a5fa}    /* 函数名 */
+.code-box .val-bad{color:#f87171}   /* 漏的行 红 */
+.code-box .val-good{color:#86efac;font-weight:bold} /* 补的行 绿 */
+
+/* 底部章节 */
+.bottom-sec{background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:26px 30px;margin-bottom:24px}
+.bottom-sec h2{font-size:18px;color:#111827;margin-bottom:6px;display:flex;align-items:center;gap:10px}
+.bottom-sec h2 .idx{color:#9ca3af;font-size:15px;font-weight:500}
+.bottom-sec .desc{color:#6b7280;font-size:14px;margin-bottom:18px}
+
+/* 翻译参数表 */
+.table{width:100%;border-collapse:collapse;font-size:14px}
+.table th,.table td{padding:12px 14px;text-align:left;border-bottom:1px solid #e5e7eb}
+.table th{background:#f9fafb;color:#374151;font-weight:600}
+.table td code{background:#eef2ff;color:#1d4ed8;padding:2px 8px;border-radius:5px;font-family:Consolas,monospace;font-size:13px}
+.table .diff td code.val-add{background:#dcfce7;color:#15803d}
+.table .diff td code.val-miss{background:#fee2e2;color:#dc2626;text-decoration:line-through}
+.table tr:hover td{background:#f9fafb}
+
+/* 页脚 */
+.foot{text-align:center;color:#9ca3af;font-size:13px;margin-top:30px}
+
+/* 响应式 */
+@media(max-width:760px){
+  .compare{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top-bar">
+    <div class="brand"><span class="logo">🎯</span>提示词工程 · 两轮对照</div>
+    <a class="back" href="swiper-task.html">← 返回课堂任务页</a>
+  </div>
+
+  <h1>任务一 · 让 Swiper 能拖动 + 圆点可点击</h1>
+  <p class="subtitle">同一个 HTML 骨架，两轮提示词，差了一个参数 <code>clickable:true</code>——看看 AI 第一次漏了什么、第二次补上了什么。</p>
+
+  <div class="banner">
+    两个轮播的 <b>HTML 完全一样</b>，只有 JS 配置差了一个 <code>clickable</code>。<b>点圆点试试</b>，下面那行数会告诉你发生了什么。
+  </div>
+
+  <!-- ══════════════ 左右两轮对照 ══════════════ -->
+  <div class="compare">
+
+    <!-- 第 1 轮：漏了 clickable -->
+    <div class="card card-bad">
+      <div class="card-head">
+        <div class="row">
+          <span class="round-no">第 1 轮</span>
+          <span class="badge">漏了需求</span>
+        </div>
+        <h2>圆点只能看，不能点</h2>
+        <p>提示词里只写了"加上圆点分页器"，AI 理解为"把圆点画出来"，于是只给了 <code>el</code>，没给 <code>clickable</code>。</p>
+      </div>
+      <div class="demo">
+        <div class="swiper" id="round1">
+          <div class="swiper-wrapper">
+            <div class="swiper-slide"><img src="swiper-imgs/tiangong_1.jpg" alt="天宫空间站"><div class="cap"><h3>天宫空间站</h3><p>点圆点试试 · 没反应</p></div></div>
+            <div class="swiper-slide"><img src="swiper-imgs/fuxing_1.jpg" alt="复兴号"><div class="cap"><h3>复兴号动车组</h3><p>点圆点试试 · 没反应</p></div></div>
+            <div class="swiper-slide"><img src="swiper-imgs/c919_1.jpg" alt="C919"><div class="cap"><h3>C919 大飞机</h3><p>点圆点试试 · 没反应</p></div></div>
+            <div class="swiper-slide"><img src="swiper-imgs/fendouzhe_1.jpg" alt="奋斗者号"><div class="cap"><h3>奋斗者号</h3><p>点圆点试试 · 没反应</p></div></div>
+          </div>
+          <div class="swiper-pagination" id="pag1"></div>
+        </div>
+      </div>
+      <div class="tip"><span class="arrow">👈</span>点<b>第 3 个圆点</b> · 当前索引 <b id="idx1">0</b> · 没有跳转 ❌</div>
+      <div class="code-box"><span class="cm">// 第 1 轮代码</span>
+<span class="kw">new</span> <span class="f">Swiper</span>(<span class="str">"#round1"</span>, {
+  <span class="cm">// ...其他配置略</span>
+  <span class="kw">pagination</span>: {
+    <span class="kw">el</span>: <span class="str">"#pag1"</span>,
+<span class="val-bad">    // ❌ 漏了 clickable: true</span>
+  }
+});</div>
+    </div>
+
+    <!-- 第 2 轮：补齐 clickable -->
+    <div class="card card-good">
+      <div class="card-head">
+        <div class="row">
+          <span class="round-no">第 2 轮</span>
+          <span class="badge">补齐需求</span>
+        </div>
+        <h2>圆点是遥控器，不是装饰</h2>
+        <p>第二轮把需求改成"圆点<b>必须能点击直接跳转</b>，不是只能看"。同一个 AI，立刻补上了 <code>clickable: true</code>。</p>
+      </div>
+      <div class="demo">
+        <div class="swiper" id="round2">
+          <div class="swiper-wrapper">
+            <div class="swiper-slide"><img src="swiper-imgs/tiangong_1.jpg" alt="天宫空间站"><div class="cap"><h3>天宫空间站</h3><p>点圆点试试 · 真的能跳 ✅</p></div></div>
+            <div class="swiper-slide"><img src="swiper-imgs/fuxing_1.jpg" alt="复兴号"><div class="cap"><h3>复兴号动车组</h3><p>点圆点试试 · 真的能跳 ✅</p></div></div>
+            <div class="swiper-slide"><img src="swiper-imgs/c919_1.jpg" alt="C919"><div class="cap"><h3>C919 大飞机</h3><p>点圆点试试 · 真的能跳 ✅</p></div></div>
+            <div class="swiper-slide"><img src="swiper-imgs/fendouzhe_1.jpg" alt="奋斗者号"><div class="cap"><h3>奋斗者号</h3><p>点圆点试试 · 真的能跳 ✅</p></div></div>
+          </div>
+          <div class="swiper-pagination" id="pag2"></div>
+        </div>
+      </div>
+      <div class="tip"><span class="arrow">👉</span>点<b>第 3 个圆点</b> · 当前索引 <b id="idx2">0</b> · 可跳转 ✅</div>
+      <div class="code-box"><span class="cm">// 第 2 轮代码</span>
+<span class="kw">new</span> <span class="f">Swiper</span>(<span class="str">"#round2"</span>, {
+  <span class="cm">// ...其他配置略</span>
+  <span class="kw">pagination</span>: {
+    <span class="kw">el</span>: <span class="str">"#pag2"</span>,
+<span class="val-good">    clickable: true</span>   <span class="cm">// ✅ 加上这一行就好了</span>
+  }
+});</div>
+    </div>
+  </div>
+
+  <!-- ══════════════ 把中文需求翻译成参数 ══════════════ -->
+  <div class="bottom-sec">
+    <h2><span class="idx">02</span> 把中文需求翻译成参数</h2>
+    <p class="desc">答辩时最容易被追问的是"这句话对应哪个参数"。这张表就是交卷前该背下来的东西。</p>
+    <table class="table">
+      <thead>
+        <tr><th style="width:30%">老师的要求（中文）</th><th style="width:28%">对应参数</th><th>为什么是它</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>让 Swiper 可以拖动</td>
+          <td><code>new Swiper("#id", {})</code></td>
+          <td>一个空配置对象就已经启用了 touch / mouse 事件</td>
+        </tr>
+        <tr>
+          <td>显示圆点分页器</td>
+          <td><code>pagination: { el: "#xxx" }</code></td>
+          <td><code>el</code> 指定哪个 DOM 当分页器，不给 el 就画不出来</td>
+        </tr>
+        <tr class="diff">
+          <td>圆点<b>能点击跳转</b>（不是摆设）</td>
+          <td><code class="val-miss">pagination: { el }</code><br><code class="val-add">pagination: { el, clickable: true }</code></td>
+          <td>默认 <code>clickable: false</code>，圆点只是视觉提示。加了这一行 Swiper 才会绑定 click 事件</td>
+        </tr>
+        <tr>
+          <td>最后一张继续往后翻会回到第一张</td>
+          <td><code>loop: true</code></td>
+          <td>无缝循环模式，需要 Swiper 在首尾各克隆一张 slide 做衔接</td>
+        </tr>
+        <tr>
+          <td>切换动画慢一点</td>
+          <td><code>speed: 600</code></td>
+          <td>单位是毫秒，默认 300；数值越大切换越慢</td>
+        </tr>
+        <tr>
+          <td>左右箭头可点</td>
+          <td><code>navigation: { prevEl, nextEl }</code></td>
+          <td>指向你 HTML 里那两个 <code>swiper-button-prev/next</code> 的选择器</td>
+        </tr>
+        <tr>
+          <td>每隔 3 秒自动翻页</td>
+          <td><code>autoplay: { delay: 3000 }</code></td>
+          <td>默认不自动播，必须显式写 autoplay 配置对象</td>
+        </tr>
+        <tr>
+          <td>用户拖了一下，自动播放不要停</td>
+          <td><code>autoplay: { disableOnInteraction: false }</code></td>
+          <td>默认 <code>true</code>，手一摸就停；改成 <code>false</code> 才会接着播</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="foot">swiper-t1-compare · 任务一提示词对照 · 高级网页设计 · 2026-2027-1</div>
+</div>
+
+<script>
+// ═══════ 第 1 轮：漏了 clickable —— 圆点画出来但点不动 ═══════
+var r1 = new Swiper("#round1", {
+  loop: true,
+  speed: 600,
+  pagination: {
+    el: "#pag1",
+    // ❌ 没有 clickable: true
+  },
+  on: {
+    slideChange: function(){
+      document.getElementById("idx1").textContent = this.realIndex;
+    }
+  }
+});
+
+// ═══════ 第 2 轮：补齐 clickable —— 圆点真的能点 ═══════
+var r2 = new Swiper("#round2", {
+  loop: true,
+  speed: 600,
+  pagination: {
+    el: "#pag2",
+    clickable: true,   // ✅ 关键差异
+  },
+  on: {
+    slideChange: function(){
+      document.getElementById("idx2").textContent = this.realIndex;
+    }
+  }
+});
+</script>
+</body>
+</html>

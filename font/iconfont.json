@@ -1,0 +1,44 @@
+{
+  "id": "5238938",
+  "name": "svg0325",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "48570042",
+      "name": "browser",
+      "font_class": "browser",
+      "unicode": "e606",
+      "unicode_decimal": 58886
+    },
+    {
+      "icon_id": "48570052",
+      "name": "love",
+      "font_class": "love",
+      "unicode": "e60a",
+      "unicode_decimal": 58890
+    },
+    {
+      "icon_id": "48570046",
+      "name": "nav",
+      "font_class": "nav",
+      "unicode": "e601",
+      "unicode_decimal": 58881
+    },
+    {
+      "icon_id": "48570054",
+      "name": "positioning",
+      "font_class": "positioning",
+      "unicode": "e603",
+      "unicode_decimal": 58883
+    },
+    {
+      "icon_id": "48582099",
+      "name": "camera",
+      "font_class": "camera",
+      "unicode": "e608",
+      "unicode_decimal": 58888
+    }
+  ]
+}

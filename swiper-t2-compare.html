@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>任务二 · Creative Effect 仿写 · Swiper 第 7 种效果</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;background:#f5f7fb;color:#1f2937;line-height:1.7}
+.wrap{max-width:1100px;margin:0 auto;padding:40px 20px 60px}
+
+/* 顶部 */
+.top-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.top-bar .brand{display:flex;align-items:center;gap:10px;font-weight:bold;color:#0f2b5b;font-size:15px}
+.top-bar .brand .logo{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#7c3aed,#ec4899);color:#fff;display:flex;align-items:center;justify-content:center;font-size:15px}
+.top-bar .back{color:#6b7280;font-size:14px;text-decoration:none}
+.top-bar .back:hover{color:#0f2b5b}
+
+h1{font-size:26px;color:#111827;margin-bottom:6px}
+.subtitle{color:#6b7280;font-size:14.5px;margin-bottom:28px}
+.subtitle b{color:#7c3aed}
+
+/* 说明横幅 */
+.banner{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 22px;margin-bottom:28px;font-size:14px;color:#4b5563}
+.banner b{color:#7c3aed}
+.banner code{background:#f3e8ff;color:#7c3aed;padding:1px 7px;border-radius:5px;font-family:Consolas,monospace}
+
+/* 效果展示台 */
+.showcase{background:#0f2b5b;border-radius:16px;padding:30px;margin-bottom:40px}
+.showcase .swiper{border-radius:12px;overflow:hidden;box-shadow:0 20px 50px rgba(0,0,0,.4)}
+.showcase .swiper-slide{position:relative;height:360px}
+.showcase .swiper-slide img{width:100%;height:100%;object-fit:cover;display:block}
+.showcase .cap{position:absolute;left:0;right:0;bottom:0;padding:40px 28px 18px;color:#fff;background:linear-gradient(transparent,rgba(0,0,0,.85))}
+.showcase .cap h3{font-size:22px;letter-spacing:2px}
+.showcase .cap p{font-size:13px;color:#cbd5e1;margin-top:6px}
+.showcase .swiper-pagination-bullet{background:#fff;opacity:.4}
+.showcase .swiper-pagination-bullet-active{background:#ec4899;opacity:1;width:22px;border-radius:6px}
+.showcase .tag{color:#fff;font-size:13px;margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.showcase .tag .dot{width:8px;height:8px;border-radius:50%;background:#ec4899;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* 代码对照：prev vs next */
+.code-compare{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-bottom:40px}
+.code-card{background:#fff;border:1px solid #e5e7eb;border-radius:14px;overflow:hidden}
+.code-head{padding:16px 20px;background:#f9fafb;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;justify-content:space-between}
+.code-head h3{font-size:15px;color:#111827;display:flex;align-items:center;gap:8px}
+.code-head .chip{font-size:11px;padding:3px 10px;border-radius:999px;font-weight:600}
+.chip-prev{background:#fef3c7;color:#b45309}
+.chip-next{background:#dbeafe;color:#1d4ed8}
+.code-desc{padding:14px 20px;font-size:13px;color:#6b7280;border-bottom:1px dashed #e5e7eb}
+.code-box{background:#1e293b;color:#e2e8f0;font-family:Consolas,"Fira Code",monospace;font-size:12.5px;padding:18px 20px;line-height:1.8;overflow-x:auto}
+.code-box .kw{color:#c084fc}
+.code-box .str{color:#86efac}
+.code-box .cm{color:#64748b}
+.code-box .num{color:#fbbf24}
+.code-box .f{color:#60a5fa}
+.code-box .hl-prev{background:rgba(251,191,36,.15);border-left:2px solid #fbbf24}
+.code-box .hl-next{background:rgba(96,165,250,.15);border-left:2px solid #60a5fa}
+
+/* 完整代码块 */
+.full-code{background:#fff;border:1px solid #e5e7eb;border-radius:14px;overflow:hidden;margin-bottom:40px}
+.full-code .code-head{background:linear-gradient(135deg,#7c3aed,#ec4899);border-bottom:none}
+.full-code .code-head h3{color:#fff}
+.full-code .code-head .chip{background:rgba(255,255,255,.2);color:#fff}
+
+/* 参数翻译表 */
+.table-sec{background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:26px 30px;margin-bottom:24px}
+.table-sec h2{font-size:18px;color:#111827;margin-bottom:14px}
+.table{width:100%;border-collapse:collapse;font-size:14px}
+.table th,.table td{padding:12px 14px;text-align:left;border-bottom:1px solid #e5e7eb}
+.table th{background:#f9fafb;color:#374151;font-weight:600}
+.table td code{background:#f3e8ff;color:#7c3aed;padding:2px 8px;border-radius:5px;font-family:Consolas,monospace;font-size:13px}
+.table tr:hover td{background:#faf5ff}
+.table .col-param{width:18%;font-family:Consolas,monospace;color:#7c3aed;font-weight:600}
+
+/* 页脚 */
+.foot{text-align:center;color:#9ca3af;font-size:13px;margin-top:30px}
+
+@media(max-width:760px){
+  .code-compare{grid-template-columns:1fr}
+  .showcase .swiper-slide{height:260px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top-bar">
+    <div class="brand"><span class="logo">🎨</span>Creative Effect · 仿写官方示例</div>
+    <a class="back" href="swiper-task.html">← 返回课堂任务页</a>
+  </div>
+
+  <h1>任务二 · Swiper 第 7 种效果：<b style="color:#7c3aed">creative 自定义变换</b></h1>
+  <p class="subtitle">课堂上讲了 slide / fade / cube / coverflow / flip / cards 六种，其实 Swiper 还有第 7 种 —— <b>creative</b>，让你手工指定前一张、后一张 slide 的 transform。</p>
+
+  <div class="banner">
+    <b>效果目标：</b>切换时，<b>上一张</b>缩小 + 左移 + 轻微旋转（"退后一点让位子"）；<b>下一张</b>放大 + 右移（"大步向前登场"）。这就是 <code>creativeEffect.prev</code> 和 <code>creativeEffect.next</code> 两个配置对象各管一边。
+  </div>
+
+  <!-- ══════════════ 实际效果展示台 ══════════════ -->
+  <div class="showcase">
+    <div class="tag"><span class="dot"></span>👉 按住左右拖动试试，或等它自动切换 · 观察前后两张 slide 的不同变换</div>
+    <div class="swiper" id="creativeDemo">
+      <div class="swiper-wrapper">
+        <div class="swiper-slide"><img src="swiper-imgs/tiangong_1.jpg" alt="天宫空间站"><div class="cap"><h3>天宫空间站</h3><p>prev 缩小左移旋转 · next 放大右移</p></div></div>
+        <div class="swiper-slide"><img src="swiper-imgs/fuxing_1.jpg" alt="复兴号"><div class="cap"><h3>复兴号动车组</h3><p>prev 缩小左移旋转 · next 放大右移</p></div></div>
+        <div class="swiper-slide"><img src="swiper-imgs/c919_1.jpg" alt="C919"><div class="cap"><h3>C919 大飞机</h3><p>prev 缩小左移旋转 · next 放大右移</p></div></div>
+        <div class="swiper-slide"><img src="swiper-imgs/fendouzhe_1.jpg" alt="奋斗者号"><div class="cap"><h3>奋斗者号</h3><p>prev 缩小左移旋转 · next 放大右移</p></div></div>
+        <div class="swiper-slide"><img src="swiper-imgs/fast_1.jpg" alt="天眼"><div class="cap"><h3>中国天眼 FAST</h3><p>prev 缩小左移旋转 · next 放大右移</p></div></div>
+        <div class="swiper-slide"><img src="swiper-imgs/aida_modu.jpg" alt="爱达魔都号"><div class="cap"><h3>爱达·魔都号</h3><p>prev 缩小左移旋转 · next 放大右移</p></div></div>
+      </div>
+      <div class="swiper-pagination" id="crePag"></div>
+    </div>
+  </div>
+
+  <!-- ══════════════ prev vs next 代码对照 ══════════════ -->
+  <div class="code-compare">
+    <!-- prev -->
+    <div class="code-card">
+      <div class="code-head">
+        <h3>← creativeEffect.prev</h3>
+        <span class="chip chip-prev">上一张 slide 的变形</span>
+      </div>
+      <div class="code-desc">当前 slide 的<b>左边那张</b>（即将退场的）看起来：<b>缩小 + 左移 + 逆时针转一点</b>，像在给主角让位。</div>
+      <div class="code-box hl-prev"><span class="kw">prev</span>: {
+  <span class="cm">// [X偏移, Y偏移, Z偏移(透视层)]</span>
+  <span class="kw">translate</span>: [<span class="num">-60</span>, <span class="num">0</span>, <span class="num">-200</span>],
+
+  <span class="cm">// [X轴旋转, Y轴旋转, Z轴旋转]（度）</span>
+  <span class="kw">rotate</span>: [<span class="num">0</span>, <span class="num">0</span>, <span class="num">-8</span>],
+
+  <span class="cm">// 透明度（0~1）</span>
+  <span class="kw">opacity</span>: <span class="num">0.4</span>,
+
+  <span class="cm">// 缩放（1=原样, <1缩小, >1放大）</span>
+  <span class="kw">scale</span>: <span class="num">0.75</span>,
+
+  <span class="kw">shadow</span>: <span class="kw">true</span>
+}</div>
+    </div>
+
+    <!-- next -->
+    <div class="code-card">
+      <div class="code-head">
+        <h3>creativeEffect.next →</h3>
+        <span class="chip chip-next">下一张 slide 的变形</span>
+      </div>
+      <div class="code-desc">当前 slide 的<b>右边那张</b>（即将登场的）看起来：<b>放大 + 右移</b>，像在大步向前迎接你。</div>
+      <div class="code-box hl-next"><span class="kw">next</span>: {
+  <span class="cm">// X方向移出去 + 稍微放大（用 CSS 百分比）</span>
+  <span class="kw">translate</span>: [<span class="str">'120%'</span>, <span class="num">0</span>, <span class="num">0</span>],
+
+  <span class="cm">// 不旋转，保持正面朝你</span>
+  <span class="kw">rotate</span>: [<span class="num">0</span>, <span class="num">0</span>, <span class="num">0</span>],
+
+  <span class="cm">// 完全不透明</span>
+  <span class="kw">opacity</span>: <span class="num">1</span>,
+
+  <span class="cm">// 稍大一点，像在"向前扑"</span>
+  <span class="kw">scale</span>: <span class="num">1.15</span>,
+
+  <span class="kw">shadow</span>: <span class="kw">true</span>
+}</div>
+    </div>
+  </div>
+
+  <!-- ══════════════ 完整初始化代码 ══════════════ -->
+  <div class="full-code">
+    <div class="code-head">
+      <h3>✨ 完整 Swiper 初始化</h3>
+      <span class="chip">抄这段就行</span>
+    </div>
+    <div class="code-box"><span class="kw">var</span> demo = <span class="kw">new</span> <span class="f">Swiper</span>(<span class="str">"#creativeDemo"</span>, {
+  <span class="kw">effect</span>: <span class="str">'creative'</span>,
+  <span class="kw">loop</span>: <span class="kw">true</span>,
+  <span class="kw">speed</span>: <span class="num">800</span>,
+  <span class="kw">autoplay</span>: { <span class="kw">delay</span>: <span class="num">2500</span>, <span class="kw">disableOnInteraction</span>: <span class="kw">false</span> },
+  <span class="kw">grabCursor</span>: <span class="kw">true</span>,
+
+  <span class="cm">// ====== creative effect 的核心 ======</span>
+  <span class="kw">creativeEffect</span>: {
+    <span class="kw">perspective</span>: <span class="num">true</span>,         <span class="cm">// 开启透视，Z 轴偏移才有 3D 感</span>
+    <span class="kw">progressMultiplier</span>: <span class="num">1</span>,  <span class="cm">// 变换强度倍数，改大更夸张</span>
+
+    <span class="cm">// ← 左边那张退场时的样子</span>
+    <span class="kw">prev</span>: {
+      <span class="kw">translate</span>: [<span class="num">-60</span>, <span class="num">0</span>, <span class="num">-200</span>],
+      <span class="kw">rotate</span>: [<span class="num">0</span>, <span class="num">0</span>, <span class="num">-8</span>],
+      <span class="kw">opacity</span>: <span class="num">0.4</span>,
+      <span class="kw">scale</span>: <span class="num">0.75</span>,
+      <span class="kw">shadow</span>: <span class="kw">true</span>
+    },
+
+    <span class="cm">// → 右边那张登场时的样子</span>
+    <span class="kw">next</span>: {
+      <span class="kw">translate</span>: [<span class="str">'120%'</span>, <span class="num">0</span>, <span class="num">0</span>],
+      <span class="kw">rotate</span>: [<span class="num">0</span>, <span class="num">0</span>, <span class="num">0</span>],
+      <span class="kw">opacity</span>: <span class="num">1</span>,
+      <span class="kw">scale</span>: <span class="num">1.15</span>,
+      <span class="kw">shadow</span>: <span class="kw">true</span>
+    }
+  },
+
+  <span class="kw">pagination</span>: { <span class="kw">el</span>: <span class="str">"#crePag"</span>, <span class="kw">clickable</span>: <span class="kw">true</span> }
+});</div>
+  </div>
+
+  <!-- ══════════════ 参数翻译表 ══════════════ -->
+  <div class="table-sec">
+    <h2>creativeEffect 参数速查表</h2>
+    <table class="table">
+      <thead>
+        <tr><th>参数</th><th>类型</th><th>它控制什么</th><th>改大 / 改小会怎样</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="col-param">perspective</td>
+          <td><code>boolean</code></td>
+          <td>是否开启 3D 透视</td>
+          <td><code>true</code> 时 Z 轴偏移生效，prev 会像"沉"到背景去</td>
+        </tr>
+        <tr>
+          <td class="col-param">prev</td>
+          <td><code>object</code></td>
+          <td>上一张 slide 的 transform（<b>左边那张</b>，即将退场）</td>
+          <td>只管退场态，跟 next 没关系</td>
+        </tr>
+        <tr>
+          <td class="col-param">next</td>
+          <td><code>object</code></td>
+          <td>下一张 slide 的 transform（<b>右边那张</b>，即将登场）</td>
+          <td>只管登场态，跟 prev 没关系</td>
+        </tr>
+        <tr>
+          <td class="col-param">translate</td>
+          <td><code>[x,y,z]</code></td>
+          <td>X/Y/Z 三轴位移（像素或百分比字符串）</td>
+          <td>X 负值=左移，正值=右移；Z 负值=变远变小</td>
+        </tr>
+        <tr>
+          <td class="col-param">rotate</td>
+          <td><code>[x,y,z]</code></td>
+          <td>X/Y/Z 三轴旋转角度（单位：度）</td>
+          <td>Z 轴负=逆时针，正=顺时针；Y 轴=翻转效果</td>
+        </tr>
+        <tr>
+          <td class="col-param">opacity</td>
+          <td><code>0~1</code></td>
+          <td>透明度</td>
+          <td><code>0</code> 完全透明，<code>1</code> 完全不透明</td>
+        </tr>
+        <tr>
+          <td class="col-param">scale</td>
+          <td><code>number</code></td>
+          <td>缩放比例</td>
+          <td><code>0.5</code> 一半大，<code>1.5</code> 一半大，<code>1</code> 原样</td>
+        </tr>
+        <tr>
+          <td class="col-param">progressMultiplier</td>
+          <td><code>number</code></td>
+          <td>整体变换强度放大系数</td>
+          <td><code>2</code> 所有 translate/rotate/opacity 变化都翻倍，效果更夸张</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="foot">swiper-t2-compare · 任务二 creative effect 仿写 · 高级网页设计 · 2026-2027-1</div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+//  ✍️ 任务二完整实现：creative effect + prev/next transform
+// ═══════════════════════════════════════════════════════
+var creativeDemo = new Swiper("#creativeDemo", {
+  effect: 'creative',
+  loop: true,
+  speed: 800,
+  autoplay: {
+    delay: 2500,
+    disableOnInteraction: false
+  },
+  grabCursor: true,
+  // ⭐ core: creative effect 的 prev / next 变换
+  creativeEffect: {
+    perspective: true,
+    progressMultiplier: 1,
+
+    // ← 上一张（左边那张）退场时的样子：缩小 + 左移 + 逆时针转一点
+    prev: {
+      translate: [-60, 0, -200],
+      rotate: [0, 0, -8],
+      opacity: 0.4,
+      scale: 0.75,
+      shadow: true
+    },
+
+    // → 下一张（右边那张）登场时的样子：放大 + 右移出屏幕
+    next: {
+      translate: ['120%', 0, 0],
+      rotate: [0, 0, 0],
+      opacity: 1,
+      scale: 1.15,
+      shadow: true
+    }
+  },
+  pagination: {
+    el: "#crePag",
+    clickable: true
+  }
+});
+</script>
+</body>
+</html>

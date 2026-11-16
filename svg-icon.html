@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>腾讯视频导航-iconfont Symbol SVG</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <script src="https://at.alicdn.com/t/c/font_5246815_qqsg7clqic.js"></script>
+</head>
+<body>
+<div class="content"></div>
+<nav class="bottom-nav">
+    <a href="#" class="nav-item active">
+        <svg class="nav-icon" aria-hidden="true">
+            <use href="#icon-a-504160096"></use>
+        </svg>
+        <span class="nav-text">首页</span>
+    </a>
+    <a href="#" class="nav-item">
+        <svg class="nav-icon" aria-hidden="true">
+            <use href="#icon-a-504160026"></use>
+        </svg>
+        <span class="nav-text">短剧</span>
+    </a>
+    <a href="#" class="nav-item">
+        <svg class="nav-icon" aria-hidden="true">
+            <use href="#icon-a-504160027"></use>
+        </svg>
+        <span class="nav-text">会员中心</span>
+    </a>
+    <a href="#" class="nav-item">
+        <svg class="nav-icon" aria-hidden="true">
+            <use href="#icon-a-504160029"></use>
+        </svg>
+        <span class="nav-text">好物</span>
+    </a>
+    <a href="#" class="nav-item">
+        <svg class="nav-icon" aria-hidden="true">
+            <use href="#icon-a-504160028"></use>
+        </svg>
+        <span class="nav-text">个人中心</span>
+    </a>
+</nav>
+
+<script>
+const items = document.querySelectorAll('.nav-item');
+items.forEach(item=>{
+    item.onclick = function(e){
+        e.preventDefault();
+        items.forEach(i=>i.classList.remove('active'));
+        this.classList.add('active');
+    }
+})
+</script>
+</body>
+</html>

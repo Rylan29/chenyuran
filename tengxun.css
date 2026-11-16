@@ -1,0 +1,239 @@
+/*==================== 【全局公共CSS 实验要求】 ==================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+ul {
+    list-style: none;
+}
+body {
+    background-color: #0f0f14;
+    color: #fff;
+    font-family: "Microsoft Yahei", sans-serif;
+}
+/* 姓名缩写 cyr-wrap 陈禹燃 */
+.cyr-wrap.container {
+    display: flex;
+}
+/* =========侧边栏模块========= */
+.sidebar {
+    width: 220px;
+    background-color: #16161f;
+    height: 100vh;
+    position: sticky;
+    left: 0;
+    top: 0;
+    padding-top:20px;
+}
+.sidebar .logo {
+    color:#00a2ff;
+    font-size:24px;
+    text-align:center;
+    margin-bottom:30px;
+    font-weight:bold;
+}
+.side-menu {
+    list-style: none;
+}
+.side-menu li{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 30px;
+    font-size: 15px;
+    cursor: pointer;
+    color:#aaa;
+}
+/* ✅ iconfont symbol 图标核心样式 */
+.iconfont {
+    width:20px;
+    height:20px;
+    fill: currentColor;
+    flex-shrink: 0;
+    pointer-events: none; /* 点击穿透svg，解决点图标没反应 */
+}
+.side-menu li.active{
+    background: #252538;
+    color:#00a2ff;
+}
+.side-menu li:hover{
+    background-color:rgba(255,255,255,0.06);
+    color:#ffffff;
+}
+
+/* =========主内容区域========= */
+.main {
+    flex: 1;
+    padding: 10px 20px;
+}
+/* =========Banner轮播模块========= */
+.banner {
+    height: 420px;
+    border-radius: 12px;
+    background-image: url("img/bg2.jpg");
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 40px;
+    position: relative;
+    overflow: hidden;
+}
+.banner::after {
+    content: "";
+    position: absolute;
+    left: 0; top: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.28);
+    z-index: 1;
+}
+.banner-text {
+    position: relative;
+    z-index: 2;
+    max-width: 500px;
+}
+.banner-text h1 {
+    font-size: 72px;
+    margin-bottom: 16px;
+}
+.tag-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+.tip-tag {
+    padding: 4px 10px;
+    background: rgba(0,0,0,0.45);
+    border-radius: 4px;
+    font-size: 14px;
+}
+.tip-tag.yellow {
+    color: #ffd030;
+}
+.banner-text p {
+    font-size: 20px;
+    line-height: 1.7;
+    margin-bottom: 24px;
+}
+.play-btn {
+    padding: 12px 32px;
+    background: rgba(255,255,255,0.25);
+    border: 1px solid #fff;
+    color: #fff;
+    border-radius: 99px;
+    font-size: 18px;
+    cursor: pointer;
+}
+.play-btn:hover {
+    background: rgba(255,255,255,0.4);
+}
+
+.banner-thumb-list {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    gap: 10px;
+}
+.thumb-item {
+    width: 90px;
+    cursor: pointer;
+    text-align: center;
+}
+.thumb-item img {
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 2px solid transparent;
+}
+.thumb-item.active img {
+    border-color: #00a2ff;
+}
+.thumb-item p {
+    margin-top: 4px;
+    font-size: 13px;
+}
+/* =========重磅热播卡片模块========= */
+.hot-area {
+    margin-top: 30px;
+}
+.hot-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+.hot-title-wrap h2 {
+    font-size: 24px;
+}
+.tab-list {
+    display: flex;
+    gap: 18px;
+}
+.tab-list li {
+    font-size: 15px;
+    color: #aaa;
+    cursor: pointer;
+}
+.tab-list li.active {
+    color: #fff;
+}
+.refresh {
+    margin-left: auto;
+    cursor: pointer;
+    color: #ccc;
+}
+.card-wrap {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 20px;
+}
+.video-card {
+    width: 100%;
+}
+.card-img {
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+}
+.card-img img {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+}
+.tag {
+    position: absolute;
+    padding: 3px 8px;
+    font-size: 12px;
+    border-radius: 3px;
+}
+.left-tag {
+    left: 6px;
+    top: 6px;
+    background: #3070ff;
+}
+.top-right {
+    right: 6px;
+    top: 6px;
+}
+.free {
+    background: #00b85c;
+}
+.vip {
+    background: #ff7b00;
+}
+.end {
+    background: #9b4de0;
+}
+.video-card h4 {
+    margin-top: 8px;
+    font-size: 15px;
+    font-weight: normal;
+}
+.video-card p {
+    margin-top: 4px;
+    color: #aaa;
+    font-size: 12px;
+}

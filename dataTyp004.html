@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据类型和运算符</title>
+</head>
+<body>
+    <div class="container">
+        <!--  -->
+    </div>
+<script>
+    var a = 10,b = 4;
+    //控制台输出
+    console.log(++a);
+    console.log(a-b>0?a:b);//三元运算符,问号前面是真的就执行问号后面的表达式，否则执行冒号后面的表达式
+    console.log(true&&false,true||false,!true);
+    var str = "hello world",num=10,ble=true,ud,boj={name:"张三",age:20},arr=[1,2,3,4,5];
+    console.log(typeof str,typeof num,typeof ble,typeof ud,typeof obj,typeof arr);
+    //浮点小数不能用二进制精确存储，JS不能用==或者===来判断两个浮点数是否相等
+    console.log(0.1+0.2 == 0.3);
+    //字符类型转换，+将数字转换成字符串，-将字符串转换成数字
+    console.log('1'+1,1+'1','11'+1-1);
+    //NaN表示不是一个数字，isNaN（）判断是否是一个数字
+    //NAN和任何变量都不相等，包括它自己
+    console.log("wangyao"-1);
+    console.log(NaN==NaN);
+    //parseInt()向下取整
+    console.log(parseInt('12.9'));
+    //如何判定一个数值是不是整数
+    //写一个数7游戏，100个数以内，包含7或者7的倍数的数不显示，要网页版
+    var grid = document.createElement('div');
+    grid.style.display = 'grid';
+    grid.style.gridTemplateColumns = 'repeat(10, 1fr)';
+    grid.style.gap = '10px';
+    document.body.appendChild(grid);
+    for(var i=1;i<=100;i++){
+        if(i%7==0||i.toString().indexOf('7')!=-1){
+            continue;
+        }
+        var cell = document.createElement('div');
+        cell.textContent = i;
+        grid.appendChild(cell);
+    }
+</script>
+</body>
+</body>
+</html>

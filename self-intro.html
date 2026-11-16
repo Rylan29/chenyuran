@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>自我介绍 — 李汶静</title>
+  <style>
+    :root{--bg:#071027;--accent1:#7c3aed;--accent2:#06b6d4;--muted:#9aa4b2}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Segoe UI,system-ui,Arial;background:linear-gradient(180deg,var(--bg),#041025);color:#e6eef6}
+    .hero{min-height:48vh;display:flex;align-items:center;padding:48px 24px;position:relative;overflow:hidden}
+    .hero-inner{max-width:1100px;margin:0 auto;display:flex;gap:28px;align-items:center}
+    .hero-card{flex:1}
+    .hero-title{font-size:40px;margin:0 0 8px;color:#fff}
+    .hero-sub{color:rgba(230,238,246,0.9);margin:0 0 18px}
+    .btn{display:inline-block;padding:10px 16px;border-radius:10px;text-decoration:none;color:inherit;border:1px solid rgba(255,255,255,0.06)}
+    .btn.primary{background:linear-gradient(90deg,var(--accent1),#5b21b6);color:#fff;border:none}
+    .decor{position:absolute;right:-10%;top:-10%;width:60vmax;height:60vmax;background:radial-gradient(circle at 30% 30%, rgba(124,58,237,0.35), rgba(124,58,237,0.12) 25%, transparent 40%),radial-gradient(circle at 70% 70%, rgba(6,182,212,0.22),transparent 40%);filter:blur(60px);pointer-events:none}
+    main{max-width:1100px;margin: -40px auto 60px;padding:20px}
+    .card{background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.03)}
+    table{width:100%;max-width:600px;border-collapse:collapse;margin:12px 0}
+    th,td{padding:8px;text-align:left}
+    form input,form textarea{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:inherit;margin-bottom:8px}
+    .site-footer{text-align:center;color:var(--muted);padding:18px 0}
+    @media(max-width:720px){.hero-inner{flex-direction:column;align-items:flex-start}.hero-title{font-size:28px}}
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-inner">
+      <div class="hero-card">
+        <h1 class="hero-title">你好，我是李汶静</h1>
+        <p class="hero-sub">学生 · 前端学习者 · 热爱网页设计与界面美学</p>
+        <p><a class="btn primary" href="https://github.com" target="_blank" rel="noreferrer">查看我的代码仓库</a></p>
+      </div>
+    </div>
+    <div class="decor" aria-hidden="true"></div>
+  </header>
+
+  <main>
+    <section class="card">
+      <h2>个人简介</h2>
+      <p>我是一名学生，喜欢编程，<strong>正在学习前端 HTML/CSS</strong>。我的目标是掌握网页开发并实现美观实用的界面。</p>
+
+      <h3>基本信息</h3>
+      <table>
+        <tr><th>姓名</th><td>李汶静</td></tr>
+        <tr><th>专业</th><td>计算机相关</td></tr>
+        <tr><th>擅长</th><td>前端基础学习</td></tr>
+      </table>
+
+      <h3>学习计划</h3>
+      <ol>
+        <li>熟练掌握 HTML 与语义化标签</li>
+        <li>掌握 CSS 布局与视觉设计</li>
+        <li>学习 JavaScript 增加交互</li>
+        <li>完成个人项目并部署上线</li>
+      </ol>
+    </section>
+
+    <section class="card" style="margin-top:16px">
+      <h3>留言表单</h3>
+      <form action="#" method="get">
+        <label for="visitor-name">访客姓名：</label>
+        <input id="visitor-name" name="visitor-name" required>
+
+        <label for="visitor-email">邮箱：</label>
+        <input id="visitor-email" name="visitor-email" type="email" required>
+
+        <label for="msg">留言内容：</label>
+        <textarea id="msg" name="msg" rows="4" required></textarea>
+
+        <div style="margin-top:8px">
+          <input class="btn primary" type="submit" value="提交留言">
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <footer class="site-footer">© 李汶静 · 《高级网页设计》课堂实践</footer>
+</body>
+</html>

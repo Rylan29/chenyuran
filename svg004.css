@@ -1,0 +1,66 @@
+.icon{
+    width: 1em;
+    height: 1em;
+    vertical-align: -0.15em;
+    fill: currentColor;
+    overflow: hidden;
+}
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body{
+    font-family: "Microsoft YaHei", Arial, sans-serif;
+    background: linear-gradient(180deg, #f8faff 0%, #eef3ff 100%);
+    color: #30384d;
+}
+.page-shell{
+    padding: 26px 20px 12px;
+}
+.back-link{
+    display: inline-block;
+    margin-bottom: 14px;
+    color: #1f54d9;
+    text-decoration: none;
+    font-weight: 600;
+}
+.back-link:hover {
+    text-decoration: underline;
+}
+h2{
+    font-size: 32px;
+    color: #1a233a;
+}
+.tab-nav{
+    display: flex;
+    justify-content:space-around;
+    /*fixed固定定位*/
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: white;
+    border-top: 2px solid #eee;
+    box-shadow: 0 -8px 18px rgba(15, 23, 42, 0.04);
+}
+.tab-item{
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: #666;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 10px 0;
+    transition: color 0.2s ease;
+}
+.tab-item svg{
+    font-size: 24px;
+    margin: 5px;
+
+}
+.tab-item.active{
+    color:red;
+}

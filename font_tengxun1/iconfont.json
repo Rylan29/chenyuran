@@ -1,0 +1,44 @@
+{
+  "id": "5246815",
+  "name": "SVG_0325",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "48768546",
+      "name": "504160026",
+      "font_class": "a-504160026",
+      "unicode": "e601",
+      "unicode_decimal": 58881
+    },
+    {
+      "icon_id": "48768547",
+      "name": "504160027",
+      "font_class": "a-504160027",
+      "unicode": "e602",
+      "unicode_decimal": 58882
+    },
+    {
+      "icon_id": "48768548",
+      "name": "504160029",
+      "font_class": "a-504160029",
+      "unicode": "e603",
+      "unicode_decimal": 58883
+    },
+    {
+      "icon_id": "48768549",
+      "name": "504160028",
+      "font_class": "a-504160028",
+      "unicode": "e604",
+      "unicode_decimal": 58884
+    },
+    {
+      "icon_id": "48768551",
+      "name": "504160096",
+      "font_class": "a-504160096",
+      "unicode": "e606",
+      "unicode_decimal": 58886
+    }
+  ]
+}
