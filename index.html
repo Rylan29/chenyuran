@@ -5,208 +5,229 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!--
     作者：陈禹燃
-    建立时间：2026-11-02 14:25
-    使用模型：Kimi-K3
-    功能名称：排行榜 Tab 选项卡页面
-    功能简介：1:1 复刻截图：左上角"排行榜"蓝色加粗大字，右侧并排 4 个 tab（新闻/证券/理财/博客，默认选中新闻，带蓝色下横线），新闻面板 10 条资讯，序号 1-3 红色、4-10 灰色；JS 外部引用 js/tab.js（Tab 类）。
+    建立时间：2026-11-16 20:53
+    使用模型：Kimi-K3.1-Pro
+    功能名称：移动端示例导航首页
+    功能简介：仿课堂作品集布局，顶部标题与标签，下方三列白色卡片，分别进入手势滑卡、摇一摇抽签、双指缩放页面。
   -->
-  <title>排行榜 · 陈禹燃</title>
+  <title>移动端示例 · 陈禹燃</title>
   <style>
-    /* 页面背景：深色黑灰色 */
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
-    html, body {
-      height: 100%;
-      background: #2b2f33;          /* 深灰黑，对齐截图底色 */
-      font-family: "Microsoft YaHei", "PingFang SC", "Helvetica Neue", sans-serif;
-      display: flex;
-      align-items: flex-start;
-      justify-content: center;
-      padding: 60px 16px;
+    body {
+      min-height: 100vh;
+      background: #eef2fa;
+      font-family: "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
+      color: #2c2c2c;
+      padding: 56px 24px 64px;
     }
 
-    /* 白色卡片 */
-    .cyr_card {
-      background: #ffffff;
-      width: 560px;
-      border-radius: 4px;
-      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
-      overflow: hidden;
-    }
-
-    /* ============= 顶部栏：左侧"排行榜" + 右侧 tab ============= */
+    /* ===================== 顶部标题区 ===================== */
     .cyr_header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 1px solid #e8eaed;
-      padding: 16px 20px 0;
+      text-align: center;
+      margin-bottom: 42px;
     }
 
-    /* "排行榜" 蓝色加粗大字 靠左 */
-    .cyr_title {
-      font-size: 22px;
+    .cyr_header-title {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 32px;
       font-weight: 700;
-      color: #1a6fe6;               /* 对齐截图蓝色 */
-      line-height: 1;
+      color: #1f2d4d;
       letter-spacing: 2px;
     }
 
-    /* tab 按钮容器 */
-    .cyr_tab-btns {
-      display: flex;
-      align-items: stretch;
+    /* 左上角四色方块图标 */
+    .cyr_header-logo {
+      display: grid;
+      grid-template-columns: repeat(2, 10px);
+      grid-template-rows: repeat(2, 10px);
+      gap: 3px;
     }
+    .cyr_header-logo span { border-radius: 2px; }
+    .cyr_header-logo span:nth-child(1) { background: #34a853; }
+    .cyr_header-logo span:nth-child(2) { background: #fbbc05; }
+    .cyr_header-logo span:nth-child(3) { background: #4285f4; }
+    .cyr_header-logo span:nth-child(4) { background: #ea4335; }
 
-    .cyr_tab-btn {
-      background: #ffffff;
-      border: 1px solid transparent;  /* 未选中：无边框背景融合 */
-      border-bottom: none;
-      padding: 10px 18px 12px;
-      margin-bottom: -1px;
-      font-size: 15px;
-      color: #4a4a4a;
-      cursor: pointer;
-      line-height: 1;
-      position: relative;
-      font-family: inherit;
-      transition: color 0.15s;
-    }
-
-    .cyr_tab-btn:hover { color: #1a6fe6; }
-
-    /* 选中态：底部蓝色横线 */
-    .cyr_tab-btn.cyr_active {
-      color: #1a6fe6;
-      font-weight: 600;
-      border-bottom: 2px solid #1a6fe6;
-    }
-
-    /* ============= 面板区 ============= */
-    .cyr_tab-panel { display: none; padding: 14px 20px 18px; }
-    .cyr_tab-panel.cyr_active { display: block; }
-
-    /* 新闻条目列表 */
-    .cyr_list { list-style: none; }
-    .cyr_list li {
-      display: flex;
-      align-items: center;
-      padding: 11px 0;
+    .cyr_header-subtitle {
+      margin-top: 12px;
       font-size: 14px;
-      color: #2c2c2c;
-      line-height: 1.55;
-      cursor: default;
+      color: #8a94a8;
+      letter-spacing: 1px;
     }
-    .cyr_list li:hover { color: #1a6fe6; }
 
-    /* 序号方块：彩色实心背景 + 白色数字 */
-    .cyr_rank {
+    .cyr_header-pill {
+      display: inline-block;
+      margin-top: 16px;
+      padding: 7px 18px;
+      border-radius: 999px;
+      background: #e3ecfb;
+      color: #4a78c2;
+      font-size: 12px;
+      letter-spacing: 1px;
+    }
+
+    /* ===================== 卡片网格 ===================== */
+    .cyr_grid {
+      max-width: 1080px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .cyr_card {
+      display: flex;
+      flex-direction: column;
+      background: #ffffff;
+      border-radius: 14px;
+      padding: 24px 22px 20px;
+      text-decoration: none;
+      color: inherit;
+      box-shadow: 0 8px 24px rgba(31, 45, 77, 0.06);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .cyr_card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 16px 36px rgba(31, 45, 77, 0.12);
+    }
+
+    /* 左上角编号方块 */
+    .cyr_card-badge {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 22px;
-      height: 22px;
-      margin-right: 12px;
-      font-size: 13px;
-      font-weight: 700;
-      line-height: 1;
-      flex-shrink: 0;
-      border-radius: 2px;
+      width: 34px;
+      height: 34px;
+      border-radius: 9px;
       color: #ffffff;
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 18px;
     }
-    /* 前 3 名：红色实心方块 */
-    .cyr_rank.cyr_rank-top    { background: #e43d33; }
-    /* 4~10：灰色实心方块 */
-    .cyr_rank.cyr_rank-normal { background: #d0d0d0; }
+    .cyr_card--blue  .cyr_card-badge { background: #3b82f6; }
+    .cyr_card--orange .cyr_card-badge { background: #f97316; }
+    .cyr_card--teal  .cyr_card-badge { background: #14b8a6; }
+
+    .cyr_card-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #1f2d4d;
+      line-height: 1.4;
+    }
+
+    .cyr_card-subtitle {
+      margin-top: 6px;
+      font-size: 12px;
+      color: #9aa4b8;
+      letter-spacing: 0.5px;
+    }
+
+    .cyr_card-desc {
+      margin-top: 14px;
+      font-size: 13px;
+      line-height: 1.9;
+      color: #6b768c;
+      flex: 1;
+    }
+
+    /* 标签 */
+    .cyr_card-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 18px;
+    }
+
+    .cyr_card-tag {
+      padding: 4px 10px;
+      border-radius: 5px;
+      font-size: 11px;
+      letter-spacing: 0.5px;
+    }
+    .cyr_card--blue  .cyr_card-tag { background: #eaf1fe; color: #3b82f6; }
+    .cyr_card--orange .cyr_card-tag { background: #fdf0e5; color: #f97316; }
+    .cyr_card--teal  .cyr_card-tag { background: #e6f7f4; color: #14b8a6; }
+
+    /* 底部链接 */
+    .cyr_card-link {
+      margin-top: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+    .cyr_card--blue  .cyr_card-link { color: #3b82f6; }
+    .cyr_card--orange .cyr_card-link { color: #f97316; }
+    .cyr_card--teal  .cyr_card-link { color: #14b8a6; }
+
+    /* ===================== 响应式 ===================== */
+    @media (max-width: 900px) {
+      .cyr_grid { grid-template-columns: 1fr; max-width: 460px; }
+      .cyr_header-title { font-size: 26px; }
+      body { padding: 36px 18px 48px; }
+    }
   </style>
 </head>
 <body>
 
-  <div class="cyr_card">
-    <!-- 顶部：左侧标题 + 右侧 tab -->
-    <div class="cyr_header">
-      <div class="cyr_title">排行榜</div>
-      <div class="cyr_tab-btns">
-        <!-- data-cyr-target 与面板 data-cyr-panel 一一对应 -->
-        <button class="cyr_tab-btn cyr_active" data-cyr-target="news">新闻</button>
-        <button class="cyr_tab-btn" data-cyr-target="stock">证券</button>
-        <button class="cyr_tab-btn" data-cyr-target="fund">理财</button>
-        <button class="cyr_tab-btn" data-cyr-target="blog">博客</button>
-      </div>
+  <!-- 顶部标题区 -->
+  <header class="cyr_header">
+    <div class="cyr_header-title">
+      <span class="cyr_header-logo" aria-hidden="true">
+        <span></span><span></span><span></span><span></span>
+      </span>
+      移动端示例
     </div>
+    <p class="cyr_header-subtitle">陈禹燃 · 学号 0325 · 移动端交互练习</p>
+    <span class="cyr_header-pill">Touch 手势 · devicemotion · 双指缩放</span>
+  </header>
 
-    <!-- 面板区 -->
-    <div class="cyr_tab-panels">
+  <!-- 三列作品卡片 -->
+  <main class="cyr_grid">
 
-      <!-- 新闻面板（默认选中，10 条资讯） -->
-      <div class="cyr_tab-panel cyr_active" data-cyr-panel="news">
-        <ol class="cyr_list">
-          <li>
-            <span class="cyr_rank cyr_rank-top">1</span>
-            <span class="cyr_text">构建"股市+债市"稳市机制！央行新工具来了</span>
-          </li>
-          <li>
-            <span class="cyr_rank cyr_rank-top">2</span>
-            <span class="cyr_text">美媒：美军已准备好再打击伊朗 特朗普或中期选举后</span>
-          </li>
-          <li>
-            <span class="cyr_rank cyr_rank-top">3</span>
-            <span class="cyr_text">姆巴佩发表涉中国不当言论，多家品牌终止合作，媒</span>
-          </li>
-          <li>
-            <span class="cyr_rank cyr_rank-normal">4</span>
-            <span class="cyr_text">东鹏饮料集团：零容忍伤害民族感情行为，终止与姆</span>
-          </li>
-          <li>
-            <span class="cyr_rank cyr_rank-normal">5</span>
-            <span class="cyr_text">300672，业绩暴增超5600%！10股业绩大增（附股）</span>
-          </li>
-          <li>
-            <span class="cyr_rank cyr_rank-normal">6</span>
-            <span class="cyr_text">史上最大IPO要来了！7位创始人身家均超130亿美元</span>
-          </li>
-          <li>
-            <span class="cyr_rank cyr_rank-normal">7</span>
-            <span class="cyr_text">外交部：对英国警方任意、过度执法行为表示强烈不</span>
-          </li>
-          <li>
-            <span class="cyr_rank cyr_rank-normal">8</span>
-            <span class="cyr_text">1000000美元！特朗普重金悬赏</span>
-          </li>
-          <li>
-            <span class="cyr_rank cyr_rank-normal">9</span>
-            <span class="cyr_text">张一鸣以6700亿元刷新中国首富财富纪录！《2026胡</span>
-          </li>
-          <li>
-            <span class="cyr_rank cyr_rank-normal">10</span>
-            <span class="cyr_text">Gucci卖不动了 开云今年将关掉至少125家门店</span>
-          </li>
-        </ol>
+    <a class="cyr_card cyr_card--blue" href="mobile-gesture.html">
+      <span class="cyr_card-badge">01</span>
+      <h2 class="cyr_card-title">手势滑卡</h2>
+      <p class="cyr_card-subtitle">移动端 · Touch 手势切换</p>
+      <p class="cyr_card-desc">左右滑动切换 4 张美食卡片，横向位移超过 40px 触发切换；支持边界提示、0.3s 过渡动画，并用 300ms 冷却防止快速连滑跳页。</p>
+      <div class="cyr_card-tags">
+        <span class="cyr_card-tag">touchstart</span>
+        <span class="cyr_card-tag">40px 阈值</span>
+        <span class="cyr_card-tag">300ms 冷却</span>
       </div>
+      <span class="cyr_card-link">打开页面 →</span>
+    </a>
 
-      <!-- 证券面板（留空） -->
-      <div class="cyr_tab-panel" data-cyr-panel="stock"></div>
+    <a class="cyr_card cyr_card--orange" href="mobile-sensor.html">
+      <span class="cyr_card-badge">02</span>
+      <h2 class="cyr_card-title">摇一摇抽签</h2>
+      <p class="cyr_card-subtitle">移动端 · 传感器交互</p>
+      <p class="cyr_card-desc">监听 devicemotion 计算合成加速度，超过阈值随机抽取今日菜谱；带弹出动画与震动反馈，设备不支持时提供"点我抽一次"降级按钮。</p>
+      <div class="cyr_card-tags">
+        <span class="cyr_card-tag">devicemotion</span>
+        <span class="cyr_card-tag">1.5s 冷却</span>
+        <span class="cyr_card-tag">降级方案</span>
+      </div>
+      <span class="cyr_card-link">打开页面 →</span>
+    </a>
 
-      <!-- 理财面板（留空） -->
-      <div class="cyr_tab-panel" data-cyr-panel="fund"></div>
+    <a class="cyr_card cyr_card--teal" href="mobile-zoom.html">
+      <span class="cyr_card-badge">03</span>
+      <h2 class="cyr_card-title">双指缩放</h2>
+      <p class="cyr_card-subtitle">移动端 · 图片查看器</p>
+      <p class="cyr_card-desc">双指按距离比例缩放图片，以两指中点为基准保证缩放不跳；放大后可单指拖动并限制边界，双击在 1x 与 2x 之间平滑切换。</p>
+      <div class="cyr_card-tags">
+        <span class="cyr_card-tag">双指缩放</span>
+        <span class="cyr_card-tag">双击 2x</span>
+        <span class="cyr_card-tag">边界限制</span>
+      </div>
+      <span class="cyr_card-link">打开页面 →</span>
+    </a>
 
-      <!-- 博客面板（留空） -->
-      <div class="cyr_tab-panel" data-cyr-panel="blog"></div>
-    </div>
-  </div>
+  </main>
 
-  <!-- 外部引用 JS：可复用 Tab 类 -->
-  <script src="js/tab.js"></script>
-  <script>
-    /*
-      作者：陈禹燃
-      建立时间：2026-11-02 14:25
-      功能：页面加载完成后实例化 Tab 类，绑定容器
-    */
-    document.addEventListener("DOMContentLoaded", function () {
-      // 实例化 Tab，传入容器选择器
-      window.newsTab = new Tab(".cyr_card");
-    });
-  </script>
 </body>
 </html>

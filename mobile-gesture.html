@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <!--
+    作者：陈禹燃
+    建立时间：2026-11-16 13:56
+    使用模型：DeepSeek-V4.1-Flash
+    功能名称：移动端美食卡片滑动切换
+    功能简介：用 touchstart / touchend 监听横向滑动手势，在 4 张渐变美食卡片之间切换，带 0.3s 过渡动画与 300ms 连滑冷却，边界时给出提示文字。
+  -->
+  <title>美食卡片滑动 · 陈禹燃</title>
+  <style>
+    /* ===================== 基础重置 ===================== */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+      min-height: 100%;
+    }
+
+    body {
+      background: #f6f1e9;
+      font-family: "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
+      color: #2c2c2c;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      /* 底部留白，保证页面本身有纵向滚动空间，便于验证 pan-y 效果 */
+      padding: 18px 16px 80px;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* ===================== 页面容器 ===================== */
+    .cyr_page {
+      width: 100%;
+      max-width: 420px;
+    }
+
+    /* 顶部：返回首页 + 标题 */
+    .cyr_topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .cyr_back-link {
+      font-size: 14px;
+      color: #8a7f70;
+      text-decoration: none;
+    }
+    .cyr_back-link:active { color: #e06a3b; }
+
+    .cyr_page-title {
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      color: #3a322a;
+    }
+
+    /* ===================== 卡片视口 =====================
+       touch-action: pan-y —— 横向滑动交给 JS 处理，
+       纵向滑动仍由浏览器接管，页面可以正常上下滚动 */
+    .cyr_viewport {
+      position: relative;
+      height: 60vh;
+      min-height: 360px;
+      max-height: 480px;
+      border-radius: 24px;
+      overflow: hidden;
+      touch-action: pan-y;
+      box-shadow: 0 18px 40px rgba(120, 80, 40, 0.18);
+      background: #ffffff;
+    }
+
+    /* 卡片轨道：四张卡片横向排列，靠 translateX 切换 */
+    .cyr_track {
+      display: flex;
+      height: 100%;
+      /* 切换动画：0.3s 过渡 */
+      transition: transform 0.3s ease;
+      will-change: transform;
+    }
+
+    /* 单张卡片 */
+    .cyr_slide {
+      position: relative;
+      flex: 0 0 100%;
+      height: 100%;
+      padding: 28px 26px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      color: #ffffff;
+      overflow: hidden;
+    }
+
+    /* 每道菜的渐变背景 */
+    .cyr_slide-1 { background: linear-gradient(150deg, #ffb75e 0%, #e8452c 100%); }
+    .cyr_slide-2 { background: linear-gradient(150deg, #ff9a8b 0%, #d63b6a 100%); }
+    .cyr_slide-3 { background: linear-gradient(150deg, #a8e063 0%, #2b8a5b 100%); }
+    .cyr_slide-4 { background: linear-gradient(150deg, #f9d976 0%, #d2691e 100%); }
+
+    /* 卡片上的装饰圆环，增加层次感 */
+    .cyr_deco {
+      position: absolute;
+      border-radius: 50%;
+      border: 36px solid rgba(255, 255, 255, 0.12);
+      pointer-events: none;
+    }
+    .cyr_deco-a {
+      width: 260px;
+      height: 260px;
+      right: -110px;
+      top: -90px;
+    }
+    .cyr_deco-b {
+      width: 160px;
+      height: 160px;
+      left: -70px;
+      bottom: -60px;
+      border-width: 24px;
+      border-color: rgba(255, 255, 255, 0.10);
+    }
+
+    /* 卡片顶部：标签 */
+    .cyr_tag {
+      position: relative;
+      z-index: 1;
+      align-self: flex-start;
+      font-size: 12px;
+      letter-spacing: 2px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.22);
+      backdrop-filter: blur(4px);
+    }
+
+    /* 卡片中部：菜名 + 简介 */
+    .cyr_slide-body {
+      position: relative;
+      z-index: 1;
+    }
+
+    .cyr_dish-name {
+      font-size: 30px;
+      font-weight: 700;
+      line-height: 1.25;
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+    }
+
+    .cyr_dish-desc {
+      font-size: 14px;
+      line-height: 1.7;
+      opacity: 0.92;
+      max-width: 90%;
+    }
+
+    /* 卡片底部：序号 + 滑动提示 */
+    .cyr_slide-foot {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+    }
+
+    .cyr_order {
+      font-size: 54px;
+      font-weight: 800;
+      line-height: 1;
+      color: rgba(255, 255, 255, 0.35);
+      font-family: "Helvetica Neue", Arial, sans-serif;
+    }
+
+    .cyr_hint {
+      font-size: 12px;
+      opacity: 0.8;
+      letter-spacing: 1px;
+    }
+
+    /* ===================== 底部指示器 ===================== */
+    .cyr_indicator {
+      margin: 18px auto 0;
+      width: fit-content;
+      padding: 8px 18px;
+      font-size: 14px;
+      color: #6b5f52;
+      background: #ffffff;
+      border-radius: 999px;
+      box-shadow: 0 6px 16px rgba(120, 80, 40, 0.12);
+      letter-spacing: 1px;
+    }
+
+    /* ===================== 边界提示浮层 ===================== */
+    .cyr_toast {
+      position: absolute;
+      left: 50%;
+      top: 18px;
+      transform: translate(-50%, -8px);
+      z-index: 5;
+      padding: 9px 18px;
+      font-size: 13px;
+      color: #ffffff;
+      background: rgba(0, 0, 0, 0.72);
+      border-radius: 999px;
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      pointer-events: none;
+    }
+    /* 显示态 */
+    .cyr_toast.cyr_show {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+
+    /* ===================== 任务一：事件侦探观察记录 ===================== */
+    .cyr_task1 {
+      margin-top: 28px;
+      padding: 22px 18px;
+      color: #3a322a;
+      background: #fffdf9;
+      border: 1px solid #eadfce;
+      border-radius: 22px;
+      box-shadow: 0 12px 28px rgba(120, 80, 40, 0.10);
+    }
+
+    .cyr_task1-header {
+      padding-bottom: 16px;
+      margin-bottom: 16px;
+      border-bottom: 1px solid #eee4d7;
+    }
+    .cyr_task1-badge {
+      display: inline-block;
+      margin-bottom: 10px;
+      padding: 4px 10px;
+      color: #9a5a30;
+      background: #f8ecdf;
+      border-radius: 999px;
+      font-size: 11px;
+    }
+    .cyr_task1 h2 { font-size: 21px; line-height: 1.4; }
+    .cyr_task1-subtitle { margin-top: 5px; color: #8a7f70; font-size: 14px; }
+    .cyr_task1 h3 { margin: 22px 0 10px; font-size: 16px; }
+    .cyr_task1-intro,
+    .cyr_task1-note { color: #74685b; font-size: 12px; line-height: 1.8; }
+    .cyr_task1-note { margin-top: 10px; }
+
+    .cyr_table-wrap { overflow-x: auto; }
+    .cyr_event-table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+      font-size: 12px;
+    }
+    .cyr_event-table th,
+    .cyr_event-table td {
+      padding: 10px 7px;
+      text-align: left;
+      vertical-align: top;
+      line-height: 1.7;
+      border-bottom: 1px solid #eee4d7;
+    }
+    .cyr_event-table th { color: #6c533e; background: #f8f2e9; font-weight: 600; }
+    .cyr_event-table th:first-child { width: 19%; }
+    .cyr_event-table th:last-child { width: 27%; }
+    .cyr_event-table code {
+      color: #87502d;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 11px;
+      overflow-wrap: anywhere;
+    }
+
+    .cyr_answer-list { padding-left: 20px; }
+    .cyr_answer-list li { padding-left: 3px; margin-bottom: 14px; }
+    .cyr_answer-list li:last-child { margin-bottom: 0; }
+    .cyr_answer-list strong { display: block; margin-bottom: 4px; font-size: 13px; line-height: 1.7; }
+    .cyr_answer-list p { color: #74685b; font-size: 12px; line-height: 1.85; }
+
+    .cyr_trajectory-box {
+      padding: 12px;
+      background: #f8f2e9;
+      border: 1px solid #eee1d1;
+      border-radius: 16px;
+    }
+    .cyr_trajectory { display: block; width: 100%; height: auto; }
+    .cyr_trajectory-caption { margin-top: 8px; color: #74685b; font-size: 12px; line-height: 1.8; text-align: center; }
+
+  </style>
+</head>
+<body>
+
+  <div class="cyr_page">
+
+    <!-- 顶部栏 -->
+    <div class="cyr_topbar">
+      <a class="cyr_back-link" href="index.html">← 返回首页</a>
+      <div class="cyr_page-title">今日美食</div>
+    </div>
+
+    <!-- 卡片视口：绑定 touchstart / touchend -->
+    <div class="cyr_viewport" id="cyr_viewport">
+      <!-- 边界提示 -->
+      <div class="cyr_toast" id="cyr_toast" aria-live="polite"></div>
+
+      <!-- 卡片轨道 -->
+      <div class="cyr_track" id="cyr_track">
+
+        <!-- 第 1 张 -->
+        <div class="cyr_slide cyr_slide-1">
+          <div class="cyr_deco cyr_deco-a"></div>
+          <div class="cyr_deco cyr_deco-b"></div>
+          <div class="cyr_tag">川味 · 招牌</div>
+          <div class="cyr_slide-body">
+            <div class="cyr_dish-name">麻辣香锅</div>
+            <div class="cyr_dish-desc">牛油底料现炒，麻辣鲜香层层递进，配上土豆片和宽粉最过瘾。</div>
+          </div>
+          <div class="cyr_slide-foot">
+            <div class="cyr_order">01</div>
+            <div class="cyr_hint">左右滑动切换</div>
+          </div>
+        </div>
+
+        <!-- 第 2 张 -->
+        <div class="cyr_slide cyr_slide-2">
+          <div class="cyr_deco cyr_deco-a"></div>
+          <div class="cyr_deco cyr_deco-b"></div>
+          <div class="cyr_tag">夏夜 · 必点</div>
+          <div class="cyr_slide-body">
+            <div class="cyr_dish-name">蒜蓉小龙虾</div>
+            <div class="cyr_dish-desc">现捞现做，蒜香浓郁不呛口，虾肉弹牙带甜，汤汁拌面一绝。</div>
+          </div>
+          <div class="cyr_slide-foot">
+            <div class="cyr_order">02</div>
+            <div class="cyr_hint">左右滑动切换</div>
+          </div>
+        </div>
+
+        <!-- 第 3 张 -->
+        <div class="cyr_slide cyr_slide-3">
+          <div class="cyr_deco cyr_deco-a"></div>
+          <div class="cyr_deco cyr_deco-b"></div>
+          <div class="cyr_tag">甜品 · 下午茶</div>
+          <div class="cyr_slide-body">
+            <div class="cyr_dish-name">抹茶千层</div>
+            <div class="cyr_dish-desc">二十层薄饼夹抹茶奶油，入口绵密，回甘清苦恰到好处。</div>
+          </div>
+          <div class="cyr_slide-foot">
+            <div class="cyr_order">03</div>
+            <div class="cyr_hint">左右滑动切换</div>
+          </div>
+        </div>
+
+        <!-- 第 4 张 -->
+        <div class="cyr_slide cyr_slide-4">
+          <div class="cyr_deco cyr_deco-a"></div>
+          <div class="cyr_deco cyr_deco-b"></div>
+          <div class="cyr_tag">主食 · 暖胃</div>
+          <div class="cyr_slide-body">
+            <div class="cyr_dish-name">番茄牛腩面</div>
+            <div class="cyr_dish-desc">牛腩慢炖三小时，汤头酸甜浓厚，手工面条筋道挂汁。</div>
+          </div>
+          <div class="cyr_slide-foot">
+            <div class="cyr_order">04</div>
+            <div class="cyr_hint">左右滑动切换</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 底部：第 N/4 张 -->
+    <div class="cyr_indicator" id="cyr_indicator">第 1/4 张</div>
+
+    <!-- 任务一：只记录观察结果，不改变上方卡片的手势逻辑 -->
+    <section class="cyr_task1" aria-labelledby="cyr_task1_title">
+      <header class="cyr_task1-header">
+        <span class="cyr_task1-badge">观察 · 记录 · 不写代码</span>
+        <h2 id="cyr_task1_title">任务一：事件侦探</h2>
+        <p class="cyr_task1-subtitle">一次拖动到底发生了什么</p>
+      </header>
+
+      <p class="cyr_task1-intro">用手机或 DevTools 设备模式依次进行单击、向上拖动、向左快速滑、双指触摸和长按后抬起，典型事件顺序记录如下。N 表示 touchmove 的实际触发次数。</p>
+
+      <h3>五种操作的事件顺序</h3>
+      <div class="cyr_table-wrap">
+        <table class="cyr_event-table">
+          <thead>
+            <tr><th>操作</th><th>事件触发顺序（参考）</th><th>观察结果</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>单击</td>
+              <td><code>touchstart → touchend → mousedown → mouseup → click</code></td>
+              <td>0 次 move；有 click</td>
+            </tr>
+            <tr>
+              <td>向上拖动</td>
+              <td><code>touchstart → touchmove × N → touchend</code></td>
+              <td>约 20～40 次；通常无 click</td>
+            </tr>
+            <tr>
+              <td>向左快速滑</td>
+              <td><code>touchstart → touchmove × N → touchend</code></td>
+              <td>约 5～15 次；通常无 click</td>
+            </tr>
+            <tr>
+              <td>双指触摸</td>
+              <td><code>touchstart（第 1 指）→ touchstart（第 2 指）→ touchmove × N → touchend → touchend</code></td>
+              <td>每指各有一次 start/end</td>
+            </tr>
+            <tr>
+              <td>长按后抬起</td>
+              <td><code>touchstart → 静止等待 → touchend → click</code></td>
+              <td>静止时 0 次 move</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="cyr_task1-note">注：touchmove 次数为参考区间，并非每移动 1px 触发一次。若浏览器接管页面滚动，结尾可能出现 touchcancel；系统弹出长按菜单时，也可能不再产生 click。</p>
+
+      <h3>三个验收问题</h3>
+      <ol class="cyr_answer-list">
+        <li>
+          <strong>一次拖动里 touchmove 大约触发多少次，和距离有什么关系？</strong>
+          <p>普通拖动通常是几十次，具体次数取决于拖动时长、设备采样率和浏览器调度。速度相近时，距离越长，持续时间通常越长，touchmove 越多；同样距离下滑得越快，次数反而可能越少。</p>
+        </li>
+        <li>
+          <strong>click 出现在 touchend 之前还是之后？</strong>
+          <p>之后。单击的常见顺序是 touchstart → touchend → mousedown → mouseup → click，其中兼容鼠标事件是否出现会因浏览器和页面设置略有差异。</p>
+        </li>
+        <li>
+          <strong>如果把 touchend 换成 touchcancel，会发生什么？</strong>
+          <p>正常抬手仍触发 touchend，因此原来的结束逻辑不会执行；只有浏览器接管滚动、系统手势打断等异常情况才触发 touchcancel。正确做法是同时监听：touchend 正常完成，touchcancel 清理状态并复位。</p>
+        </li>
+      </ol>
+
+      <h3>加分：坐标轨迹草图</h3>
+      <div class="cyr_trajectory-box">
+        <svg class="cyr_trajectory" viewBox="0 0 340 230" role="img" aria-label="手指从坐标 270,190 向上并略向左拖动到 150,45，中间产生多个 touchmove 采样点">
+          <defs>
+            <marker id="cyr_arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto">
+              <path d="M1 1 L7 4 L1 7 Z" fill="#c26432"></path>
+            </marker>
+          </defs>
+          <g stroke="#e7dac9" stroke-width="1">
+            <line x1="40" y1="45" x2="310" y2="45"></line>
+            <line x1="40" y1="90" x2="310" y2="90"></line>
+            <line x1="40" y1="135" x2="310" y2="135"></line>
+            <line x1="40" y1="180" x2="310" y2="180"></line>
+          </g>
+          <path d="M270 190 L245 155 L215 120 L185 85 L150 45" fill="none" stroke="#c26432" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#cyr_arrow)"></path>
+          <g fill="#fffdf9" stroke="#c26432" stroke-width="2">
+            <circle cx="270" cy="190" r="6"></circle>
+            <circle cx="245" cy="155" r="4"></circle>
+            <circle cx="215" cy="120" r="4"></circle>
+            <circle cx="185" cy="85" r="4"></circle>
+          </g>
+          <circle cx="150" cy="45" r="6" fill="#c26432"></circle>
+          <line x1="220" y1="115" x2="238" y2="103" stroke="#9b8875" stroke-width="1" stroke-dasharray="3 3"></line>
+          <text x="240" y="103" fill="#6c533e" font-size="11">touchmove</text>
+          <text x="172" y="216" fill="#6c533e" font-size="11">touchstart (270,190)</text>
+          <text x="18" y="28" fill="#6c533e" font-size="11">touchend (150,45)</text>
+        </svg>
+        <p class="cyr_trajectory-caption">示例路径：(270,190) → (245,155) → (215,120) → (185,85) → (150,45)。手指向上并略向左移动，clientX 与 clientY 都逐渐减小。</p>
+      </div>
+    </section>
+
+  </div>
+
+  <script>
+    /*
+      作者：陈禹燃
+      建立时间：2026-11-16 13:56
+      功能：移动端美食卡片手势切换逻辑
+    */
+    (function () {
+      "use strict";
+
+      /* ===================== 常量与状态 ===================== */
+      var cyr_THRESHOLD = 40;    // 横向位移阈值（px）
+      var cyr_COOLDOWN = 300;    // 连滑冷却时间（ms）
+
+      var cyr_viewport = document.getElementById("cyr_viewport");
+      var cyr_track = document.getElementById("cyr_track");
+      var cyr_indicator = document.getElementById("cyr_indicator");
+      var cyr_toast = document.getElementById("cyr_toast");
+
+      var cyr_total = cyr_track.children.length;  // 卡片总数
+      var cyr_index = 0;                          // 当前卡片下标（从 0 开始）
+      var cyr_startX = 0;                         // 手指按下时的横坐标
+      var cyr_startY = 0;                         // 手指按下时的纵坐标
+      var cyr_lastSwitchAt = 0;                   // 上次有效滑动的时间戳
+      var cyr_toastTimer = null;                  // 边界提示的隐藏定时器
+      var cyr_isTouching = false;                 // 是否处于触摸中
+
+      /**
+       * 功能：把卡片轨道平移到指定下标，并同步底部"第 N/4 张"文案
+       * 作者：陈禹燃
+       * 建立时间：2026-11-16 13:56
+       * @param {number} cyr_target - 目标卡片下标（0 ~ cyr_total-1）
+       * @returns {void}
+       */
+      function cyr_goTo(cyr_target) {
+        cyr_index = cyr_target;
+        // 一次移动一张卡片的宽度，配合 CSS 的 0.3s transition 形成切换动画
+        cyr_track.style.transform = "translateX(" + (-cyr_index * 100) + "%)";
+        cyr_indicator.textContent = "第 " + (cyr_index + 1) + "/" + cyr_total + " 张";
+      }
+
+      /**
+       * 功能：显示卡片顶部的临时提示文字，1.2s 后自动淡出
+       * 作者：陈禹燃
+       * 建立时间：2026-11-16 13:56
+       * @param {string} cyr_text - 提示文案
+       * @returns {void}
+       */
+      function cyr_showToast(cyr_text) {
+        cyr_toast.textContent = cyr_text;
+        cyr_toast.classList.add("cyr_show");
+
+        // 重复触发时先清掉上一次的定时器，避免提前消失
+        if (cyr_toastTimer) {
+          clearTimeout(cyr_toastTimer);
+        }
+        cyr_toastTimer = setTimeout(function () {
+          cyr_toast.classList.remove("cyr_show");
+        }, 1200);
+      }
+
+      /**
+       * 功能：根据横向位移量处理一次滑动：左滑下一张、右滑上一张，并处理边界
+       * 作者：陈禹燃
+       * 建立时间：2026-11-16 13:56
+       * @param {number} cyr_dx - 横向位移量（终点 x 减起点 x，左滑为负）
+       * @returns {void}
+       */
+      function cyr_handleSwipe(cyr_dx) {
+        // 左滑：切换到下一张
+        if (cyr_dx < 0) {
+          if (cyr_index >= cyr_total - 1) {
+            cyr_showToast("已经是最后一张");
+            return;
+          }
+          cyr_goTo(cyr_index + 1);
+          return;
+        }
+
+        // 右滑：切换到上一张
+        if (cyr_index <= 0) {
+          cyr_showToast("已经是第一张");
+          return;
+        }
+        cyr_goTo(cyr_index - 1);
+      }
+
+      /**
+       * 功能：touchstart 时记录手指起始坐标
+       * 作者：陈禹燃
+       * 建立时间：2026-11-16 13:56
+       * @param {TouchEvent} cyr_event - 触摸事件对象
+       * @returns {void}
+       */
+      function cyr_onTouchStart(cyr_event) {
+        var cyr_touch = cyr_event.touches[0];
+        cyr_startX = cyr_touch.clientX;
+        cyr_startY = cyr_touch.clientY;
+        cyr_isTouching = true;
+      }
+
+      /**
+       * 功能：touchend 时用 changedTouches[0] 计算横向位移，超过阈值才触发切换
+       * 作者：陈禹燃
+       * 建立时间：2026-11-16 13:56
+       * @param {TouchEvent} cyr_event - 触摸事件对象
+       * @returns {void}
+       */
+      function cyr_onTouchEnd(cyr_event) {
+        if (!cyr_isTouching) {
+          return;
+        }
+        cyr_isTouching = false;
+
+        // 用 changedTouches[0] 读取抬起手指的坐标
+        var cyr_touch = cyr_event.changedTouches[0];
+        var cyr_dx = cyr_touch.clientX - cyr_startX;
+        var cyr_dy = cyr_touch.clientY - cyr_startY;
+
+        // 横向位移不足阈值，或纵向位移更大（属于页面滚动），不做切换
+        if (Math.abs(cyr_dx) < cyr_THRESHOLD || Math.abs(cyr_dx) <= Math.abs(cyr_dy)) {
+          return;
+        }
+
+        // 300ms 冷却：防止快速连滑一次跳过两张
+        var cyr_now = Date.now();
+        if (cyr_now - cyr_lastSwitchAt < cyr_COOLDOWN) {
+          return;
+        }
+        cyr_lastSwitchAt = cyr_now;
+
+        cyr_handleSwipe(cyr_dx);
+      }
+
+      /* ===================== 事件绑定与初始化 ===================== */
+      cyr_viewport.addEventListener("touchstart", cyr_onTouchStart, { passive: true });
+      cyr_viewport.addEventListener("touchend", cyr_onTouchEnd, { passive: true });
+      cyr_viewport.addEventListener("touchcancel", function () {
+        cyr_isTouching = false;
+      }, { passive: true });
+
+      // 初始渲染第 1 张（关闭过渡，避免首屏闪动）
+      cyr_track.style.transition = "none";
+      cyr_goTo(0);
+      // 强制回流后再恢复 0.3s 过渡
+      void cyr_track.offsetWidth;
+      cyr_track.style.transition = "";
+    })();
+  </script>
+</body>
+</html>

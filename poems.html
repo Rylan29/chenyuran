@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!--
+    作者：陈禹燃
+    建立时间：2026-11-12 13:47
+    使用模型：GLM-5.3-Flash
+    功能名称：诗词展示页面（上图下文）
+    功能简介：通过本地数据服务器（端口 3007）的 /poems 与 /api/authors 两个接口，
+             用 Promise.all 并发取回诗词图片、title、author、content 与作者统计，
+             以"上图下文"卡片结构展示，并支持关键字搜索与按标题长度排序。
+  -->
+  <title>诗词展示 - 上图下文</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+      background: linear-gradient(135deg, #f5f0e8 0%, #e8e0d0 100%);
+      min-height: 100vh;
+      padding: 30px 20px;
+    }
+
+    h1.page-title {
+      text-align: center;
+      color: #5b4636;
+      font-size: 32px;
+      letter-spacing: 8px;
+      margin-bottom: 8px;
+    }
+
+    p.page-subtitle {
+      text-align: center;
+      color: #9a8a78;
+      font-size: 14px;
+      margin-bottom: 30px;
+    }
+
+    /* 诗词卡片容器：响应式网格布局 */
+    .poem-list {
+      max-width: 1000px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 24px;
+    }
+
+    /* 单张诗词卡片：图片在上，文字在下 */
+    .poem-card {
+      background: #fffdf8;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(91, 70, 54, 0.15);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .poem-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 8px 20px rgba(91, 70, 54, 0.25);
+    }
+
+    .poem-card img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .poem-info {
+      padding: 14px 16px 18px;
+    }
+
+    .poem-title {
+      font-size: 18px;
+      color: #3d2f22;
+      font-weight: bold;
+      margin-bottom: 8px;
+      border-left: 4px solid #c9a86a;
+      padding-left: 10px;
+    }
+
+    .poem-content {
+      font-size: 14px;
+      color: #6b5d4d;
+      line-height: 1.8;
+    }
+
+    /* 作者统计栏：展示 /api/authors 返回的作者及作品数量 */
+    .author-bar {
+      max-width: 1000px;
+      margin: 0 auto 24px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .author-tag {
+      background: #fffdf8;
+      border: 1px solid #d8c9a8;
+      color: #6b5d4d;
+      font-size: 13px;
+      padding: 6px 14px;
+      border-radius: 20px;
+    }
+
+    .author-tag strong {
+      color: #3d2f22;
+    }
+
+    /* 卡片内的作者署名 */
+    .poem-author {
+      font-size: 13px;
+      color: #9a8a78;
+      margin-bottom: 8px;
+      padding-left: 14px;
+    }
+
+    /* 顶部工具栏：搜索框 + 排序按钮 */
+    .toolbar {
+      max-width: 1000px;
+      margin: 0 auto 24px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .toolbar input {
+      flex: 0 1 320px;
+      padding: 10px 16px;
+      font-size: 14px;
+      color: #3d2f22;
+      background: #fffdf8;
+      border: 1px solid #d8c9a8;
+      border-radius: 22px;
+      outline: none;
+      transition: border-color 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .toolbar input:focus {
+      border-color: #c9a86a;
+      box-shadow: 0 0 0 3px rgba(201, 168, 106, 0.2);
+    }
+
+    .toolbar button {
+      padding: 10px 20px;
+      font-size: 14px;
+      color: #fffdf8;
+      background: #8b6f47;
+      border: none;
+      border-radius: 22px;
+      cursor: pointer;
+      transition: background 0.25s ease;
+    }
+
+    .toolbar button:hover {
+      background: #6f5737;
+    }
+
+    /* 加载与错误提示 */
+    .tip {
+      text-align: center;
+      color: #9a8a78;
+      font-size: 16px;
+      padding: 40px 0;
+      grid-column: 1 / -1;
+    }
+  </style>
+</head>
+<body>
+  <h1 class="page-title">古 诗 词 欣 赏</h1>
+  <p class="page-subtitle">数据来源：本地服务器 localhost:3007 —— /poems 与 /api/authors</p>
+
+  <!-- 顶部工具栏：关键字搜索 + 按标题长度排序 -->
+  <div class="toolbar">
+    <input type="text" id="searchInput" placeholder="输入关键字，搜索标题或内容……">
+    <button type="button" id="sortBtn">按标题长度排序</button>
+  </div>
+
+  <!-- 作者统计栏：由 /api/authors 接口数据渲染 -->
+  <div class="author-bar" id="authorBar"></div>
+
+  <!-- 诗词卡片渲染容器 -->
+  <div class="poem-list" id="poemList">
+    <p class="tip" id="tip">正在加载诗词数据……</p>
+  </div>
+
+  <script>
+    /**
+     * 功能：用 Promise.all 并发请求 /poems 与 /api/authors 两个接口，一次性取回诗词与作者数据
+     * 作者：陈禹燃
+     * 建立时间：2026-11-12 14:30
+     * @param {void} 无参数
+     * @returns {Object} 返回 { poems, authors } 两份数据
+     */
+    async function fetchAllData() {
+      // Promise.all 并发发出两个请求，总耗时取决于较慢的那个
+      const [poemsRes, authorsRes] = await Promise.all([
+        fetch('http://localhost:3007/poems'),
+        fetch('http://localhost:3007/api/authors')
+      ]);
+
+      // 任一接口状态异常都要抛出错误，交给外层 catch 处理
+      if (!poemsRes.ok) {
+        throw new Error('诗词接口响应异常：' + poemsRes.status);
+      }
+      if (!authorsRes.ok) {
+        throw new Error('作者接口响应异常：' + authorsRes.status);
+      }
+
+      // 两个响应体也并发解析成 JSON
+      const [poemData, authorData] = await Promise.all([
+        poemsRes.json(),
+        authorsRes.json()
+      ]);
+
+      return {
+        poems: poemData.poems || [],
+        authors: authorData.authors || []
+      };
+    }
+
+    /**
+     * 功能：渲染作者统计栏，展示每位作者及其作品数量
+     * 作者：陈禹燃
+     * 建立时间：2026-11-12 14:30
+     * @param {Array} authors - 作者数组，元素形如 { name, count }
+     * @returns {void} 无返回值，直接填充 #authorBar 容器
+     */
+    function renderAuthors(authors) {
+      const barEl = document.getElementById('authorBar');
+      barEl.innerHTML = '';
+
+      authors.forEach((author) => {
+        const tag = document.createElement('span');
+        tag.className = 'author-tag';
+        tag.innerHTML = '<strong>' + author.name + '</strong> · ' + author.count + ' 首';
+        barEl.appendChild(tag);
+      });
+    }
+
+    // 保存接口返回的全部诗词，搜索与排序都在这份本地数据上做，不再重新请求
+    let allPoems = [];
+    // 排序状态：null = 未排序，true = 标题长度升序，false = 降序
+    let sortAsc = null;
+
+    /**
+     * 功能：渲染诗词卡片列表（上图下文），无数据时显示提示
+     * 作者：陈禹燃
+     * 建立时间：2026-11-12 14:45
+     * @param {Array} poems - 待渲染的诗词数组
+     * @returns {void} 无返回值，直接填充 #poemList 容器
+     */
+    function renderPoems(poems) {
+      const listEl = document.getElementById('poemList');
+      listEl.innerHTML = '';
+
+      if (poems.length === 0) {
+        const tip = document.createElement('p');
+        tip.className = 'tip';
+        tip.textContent = '没有匹配的诗词，换个关键字试试～';
+        listEl.appendChild(tip);
+        return;
+      }
+
+      // 遍历数组，生成上图（pic）下文（title + author + content）的卡片结构
+      poems.forEach((poem) => {
+        const card = document.createElement('div');
+        card.className = 'poem-card';
+
+        const img = document.createElement('img');
+        img.src = poem.pic;
+        img.alt = poem.title;
+
+        const info = document.createElement('div');
+        info.className = 'poem-info';
+
+        const title = document.createElement('h2');
+        title.className = 'poem-title';
+        title.textContent = poem.title;
+
+        const author = document.createElement('p');
+        author.className = 'poem-author';
+        author.textContent = poem.author || '佚名';
+
+        const content = document.createElement('p');
+        content.className = 'poem-content';
+        content.textContent = poem.content;
+
+        info.appendChild(title);
+        info.appendChild(author);
+        info.appendChild(content);
+        card.appendChild(img);
+        card.appendChild(info);
+        listEl.appendChild(card);
+      });
+    }
+
+    /**
+     * 功能：按搜索关键字过滤（标题或内容匹配），再按标题长度排序，最后重新渲染
+     * 作者：陈禹燃
+     * 建立时间：2026-11-12 14:45
+     * @param {void} 无参数，关键字取自 #searchInput，排序方向取自 sortAsc
+     * @returns {void} 无返回值，结果交给 renderPoems 渲染
+     */
+    function applyFilterAndSort() {
+      const keyword = document.getElementById('searchInput').value.trim();
+
+      // 关键字为空时用全部数据，否则过滤标题或包含关键字的内容
+      const filtered = keyword
+        ? allPoems.filter((poem) =>
+            poem.title.includes(keyword) || poem.content.includes(keyword)
+          )
+        : allPoems.slice();
+
+      // 点上按钮后 sortAsc 不再是 null，才按标题长度排序
+      if (sortAsc !== null) {
+        filtered.sort((a, b) =>
+          sortAsc ? a.title.length - b.title.length : b.title.length - a.title.length
+        );
+      }
+
+      renderPoems(filtered);
+    }
+
+    /**
+     * 功能：为搜索框绑定实时过滤、为排序按钮绑定升/降序切换
+     * 作者：陈禹燃
+     * 建立时间：2026-11-12 14:45
+     * @param {void} 无参数
+     * @returns {void} 无返回值，仅注册事件监听
+     */
+    function bindToolbarEvents() {
+      const searchInput = document.getElementById('searchInput');
+      const sortBtn = document.getElementById('sortBtn');
+
+      // 输入即过滤，不需要重新请求接口
+      searchInput.addEventListener('input', applyFilterAndSort);
+
+      // 第一次点击按标题长度升序，再点切换为降序
+      sortBtn.addEventListener('click', () => {
+        sortAsc = sortAsc === null ? true : !sortAsc;
+        sortBtn.textContent = sortAsc ? '按标题长度排序（短→长）' : '按标题长度排序（长→短）';
+        applyFilterAndSort();
+      });
+    }
+
+    /**
+     * 功能：获取诗词与作者数据并渲染"上图下文"卡片，失败时显示提示而不是白屏
+     * 作者：陈禹燃
+     * 建立时间：2026-11-12 13:47
+     * @param {void} 无参数
+     * @returns {void} 无返回值，页面加载后异步获取数据并填充 #poemList 容器
+     */
+    async function loadPoems() {
+      try {
+        const { poems, authors } = await fetchAllData();
+
+        // 缓存全部诗词，后续搜索/排序直接复用，不再发请求
+        allPoems = poems;
+
+        // 先渲染作者统计栏（第二个接口的数据）
+        renderAuthors(authors);
+
+        if (poems.length === 0) {
+          renderPoems([]);
+          return;
+        }
+
+        // 首次渲染：无关键字、未排序
+        applyFilterAndSort();
+      } catch (err) {
+        // 加载失败（如服务器未启动）时给出提示，避免白屏
+        const listEl = document.getElementById('poemList');
+        listEl.innerHTML = '';
+        const tip = document.createElement('p');
+        tip.className = 'tip';
+        tip.textContent = '加载失败：' + err.message + '（请确认已运行 node db/server.js 启动服务器）';
+        listEl.appendChild(tip);
+        document.getElementById('authorBar').innerHTML = '';
+      }
+    }
+
+    // 页面加载完成后绑定工具栏事件并获取数据渲染
+    window.addEventListener('DOMContentLoaded', () => {
+      bindToolbarEvents();
+      loadPoems();
+    });
+  </script>
+</body>
+</html>
