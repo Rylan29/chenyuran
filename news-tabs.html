@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!--
+    作者：陈禹燃
+    建立时间：2026-11-02 13:40
+    使用模型：Kimi-K3
+    功能名称：新闻 tab 选项卡页面
+    功能简介：展示国内新闻、省内新闻、国际新闻、最热新闻四个选项卡，默认选中"国内新闻"，JS 外部引用 js/news-tabs.js 实现可复用切换逻辑。
+  -->
+  <title>新闻选项卡 · 陈禹燃</title>
+  <style>
+    /* 说明：页面样式，简体中文注释；标识符保留英文 */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+      background: #f0f2f5;
+      padding: 40px 16px;
+    }
+
+    .cyr_page-title {
+      text-align: center;
+      font-size: 22px;
+      color: #1f2d3d;
+      margin-bottom: 24px;
+    }
+
+    /* 选项卡组容器 */
+    .cyr_tabs {
+      max-width: 720px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+      overflow: hidden;
+    }
+
+    /* 按钮区：横向排列 */
+    .cyr_tab-btns {
+      display: flex;
+      border-bottom: 1px solid #e4e7ed;
+      background: #fafafa;
+    }
+
+    .cyr_tab-btn {
+      flex: 1;
+      padding: 14px 0;
+      border: none;
+      background: transparent;
+      font-size: 15px;
+      color: #606266;
+      cursor: pointer;
+      position: relative;
+      transition: color 0.2s, background 0.2s;
+    }
+
+    .cyr_tab-btn:hover { color: #409eff; background: #f5f7fa; }
+
+    /* 选中状态：高亮文字 + 底部指示条 */
+    .cyr_tab-btn.cyr_active {
+      color: #409eff;
+      font-weight: 600;
+      background: #fff;
+    }
+
+    .cyr_tab-btn.cyr_active::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -1px;
+      height: 2px;
+      background: #409eff;
+    }
+
+    /* 面板默认隐藏，选中时显示 */
+    .cyr_tab-panel { display: none; padding: 20px 24px; }
+    .cyr_tab-panel.cyr_active { display: block; }
+
+    .cyr_news-item {
+      padding: 12px 0;
+      border-bottom: 1px dashed #ebeef5;
+      font-size: 14px;
+      color: #303133;
+      list-style: none;
+    }
+
+    .cyr_news-item:last-child { border-bottom: none; }
+    .cyr_news-item:hover { color: #409eff; }
+  </style>
+</head>
+<body>
+
+  <h1 class="cyr_page-title">新闻中心 · tab 选项卡</h1>
+
+  <!-- 选项卡组：按钮 data-cyr-target 与面板 data-cyr-panel 一一对应 -->
+  <div class="cyr_tabs">
+    <div class="cyr_tab-btns">
+      <button class="cyr_tab-btn cyr_active" data-cyr-target="domestic">国内新闻</button>
+      <button class="cyr_tab-btn" data-cyr-target="province">省内新闻</button>
+      <button class="cyr_tab-btn" data-cyr-target="world">国际新闻</button>
+      <button class="cyr_tab-btn" data-cyr-target="hot">最热新闻</button>
+    </div>
+
+    <div class="cyr_tab-panels">
+      <!-- 国内新闻（默认选项，初始带 cyr_active） -->
+      <div class="cyr_tab-panel cyr_active" data-cyr-panel="domestic">
+        <ul>
+          <li class="cyr_news-item">全国科技创新大会在京召开，多项成果集中发布</li>
+          <li class="cyr_news-item">国家医保局：新版药品目录新增百余种药品</li>
+          <li class="cyr_news-item">全国秋粮收获进度超九成，丰收已成定局</li>
+        </ul>
+      </div>
+
+      <!-- 省内新闻 -->
+      <div class="cyr_tab-panel" data-cyr-panel="province">
+        <ul>
+          <li class="cyr_news-item">我省重点交通项目提前完成年度投资计划</li>
+          <li class="cyr_news-item">全省高校毕业生就业帮扶专项行动启动</li>
+          <li class="cyr_news-item">省内多地入选全国乡村旅游重点村镇名单</li>
+        </ul>
+      </div>
+
+      <!-- 国际新闻 -->
+      <div class="cyr_tab-panel" data-cyr-panel="world">
+        <ul>
+          <li class="cyr_news-item">联合国气候变化大会达成新一轮合作协议</li>
+          <li class="cyr_news-item">多国联合科考队完成深海探测任务</li>
+          <li class="cyr_news-item">国际能源署发布全球可再生能源年度报告</li>
+        </ul>
+      </div>
+
+      <!-- 最热新闻 -->
+      <div class="cyr_tab-panel" data-cyr-panel="hot">
+        <ul>
+          <li class="cyr_news-item">热议：人工智能辅助教学走进中小学课堂</li>
+          <li class="cyr_news-item">关注：新能源汽车保有量突破新高</li>
+          <li class="cyr_news-item">刷屏：国产大飞机新增多条商业航线</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- 外部引用 JS：可复用选项卡逻辑 -->
+  <script src="js/news-tabs.js"></script>
+</body>
+</html>
