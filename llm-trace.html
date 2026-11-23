@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!--
+    作者：陈禹燃
+    建立时间：2026-11-23
+    使用模型：DeepSeek-V4.1-Flash
+    功能名称：LLM 实践操作痕迹展示
+    功能简介：把课堂截图按 AI 聊天 / 在线客服 / 语音识别 / 知识库问答 / 图像识别 五个功能分类排列展示。
+  -->
+  <title>LLM 实践操作痕迹 · 陈禹燃</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      background: #f0f3f8;
+      font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+      color: #0f1d3d;
+      padding: 32px 20px 80px;
+    }
+
+    .wrap {
+      max-width: 1080px;
+      margin: 0 auto;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 8px;
+    }
+    .topbar a {
+      color: #1c4edb;
+      text-decoration: none;
+      font-size: 14px;
+    }
+    .topbar a:hover { text-decoration: underline; }
+
+    h1 {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .sub {
+      color: #5f6d82;
+      font-size: 14px;
+      margin-bottom: 32px;
+    }
+
+    .func-section {
+      margin-bottom: 44px;
+    }
+
+    .func-head {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding-bottom: 12px;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #1c4edb;
+    }
+    .func-num {
+      font-size: 28px;
+      font-weight: 800;
+      color: #1c4edb;
+      opacity: 0.85;
+    }
+    .func-title {
+      font-size: 22px;
+      font-weight: 700;
+    }
+    .func-desc {
+      font-size: 13px;
+      color: #5f6d82;
+      margin-left: auto;
+      max-width: 420px;
+      text-align: right;
+      line-height: 1.6;
+    }
+
+    .shot-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+      gap: 24px;
+    }
+
+    .shot-card {
+      background: #ffffff;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 6px 18px rgba(18, 34, 66, 0.08);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .shot-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 14px 28px rgba(18, 34, 66, 0.14);
+    }
+
+    .shot-img {
+      width: 100%;
+      height: auto;
+      display: block;
+      background: #eef2fa;
+      cursor: zoom-in;
+    }
+
+    .shot-meta {
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .shot-tag {
+      font-size: 13px;
+      color: #1c4edb;
+      background: #eaf0ff;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-weight: 500;
+    }
+    .shot-note {
+      font-size: 13px;
+      color: #5f6d82;
+    }
+
+    /* 点击图片放大的 lightbox */
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      background: rgba(10, 14, 28, 0.88);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+      padding: 40px;
+      cursor: zoom-out;
+    }
+    .lightbox.show { display: flex; }
+    .lightbox img {
+      max-width: 100%;
+      max-height: 100%;
+      border-radius: 8px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    }
+    .lightbox-close {
+      position: absolute;
+      top: 20px;
+      right: 24px;
+      color: #fff;
+      font-size: 32px;
+      cursor: pointer;
+      opacity: 0.85;
+    }
+    .lightbox-close:hover { opacity: 1; }
+
+    @media (max-width: 640px) {
+      h1 { font-size: 22px; }
+      .func-title { font-size: 18px; }
+      .func-desc { display: none; }
+      .shot-grid { grid-template-columns: 1fr; }
+      body { padding: 20px 14px 60px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <a href="./index.html">← 返回课程目录</a>
+    </div>
+
+    <h1>LLM 实践操作痕迹</h1>
+    <p class="sub">许昌外卖小程序 · 七个 AI 能力模块的课堂实操过程（截图共 8 张）</p>
+
+    <!-- 05 AI 聊天 -->
+    <section class="func-section">
+      <div class="func-head">
+        <div class="func-num">05</div>
+        <div class="func-title">AI 聊天</div>
+        <div class="func-desc">调用大模型实时对话，支持硅基流动 / 七牛云切换</div>
+      </div>
+      <div class="shot-grid">
+        <div class="shot-card">
+          <img class="shot-img" src="./img/llm-trace/llm_1.png" alt="AI 聊天 · 硅基流动" onclick="openLightbox(this)">
+          <div class="shot-meta">
+            <span class="shot-tag">chat.html</span>
+            <span class="shot-note">硅基流动 · DeepSeek-V4-Flash</span>
+          </div>
+        </div>
+        <div class="shot-card">
+          <img class="shot-img" src="./img/llm-trace/llm_2.png" alt="AI 聊天 · 七牛云" onclick="openLightbox(this)">
+          <div class="shot-meta">
+            <span class="shot-tag">chat.html</span>
+            <span class="shot-note">七牛云 · Conatus-Free</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 06 在线客服 -->
+    <section class="func-section">
+      <div class="func-head">
+        <div class="func-num">06</div>
+        <div class="func-title">在线客服</div>
+        <div class="func-desc">中华美食街智能客服，支持硅基流动 / 七牛云切换</div>
+      </div>
+      <div class="shot-grid">
+        <div class="shot-card">
+          <img class="shot-img" src="./img/llm-trace/llm_3.png" alt="在线客服 · 硅基流动" onclick="openLightbox(this)">
+          <div class="shot-meta">
+            <span class="shot-tag">service.html</span>
+            <span class="shot-note">硅基流动 · 正常咨询</span>
+          </div>
+        </div>
+        <div class="shot-card">
+          <img class="shot-img" src="./img/llm-trace/llm_4.png" alt="在线客服 · 七牛云" onclick="openLightbox(this)">
+          <div class="shot-meta">
+            <span class="shot-tag">service.html</span>
+            <span class="shot-note">七牛云 · 七牛忙时降级</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 07 语音识别 -->
+    <section class="func-section">
+      <div class="func-head">
+        <div class="func-num">07</div>
+        <div class="func-title">语音识别</div>
+        <div class="func-desc">录音或上传音频，由七牛云 ASR 模型转录为文字</div>
+      </div>
+      <div class="shot-grid">
+        <div class="shot-card">
+          <img class="shot-img" src="./img/llm-trace/llm_5.png" alt="语音识别" onclick="openLightbox(this)">
+          <div class="shot-meta">
+            <span class="shot-tag">asr.html</span>
+            <span class="shot-note">pytest wav 文件上传 · 5 秒录音识别</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 08 知识库问答 -->
+    <section class="func-section">
+      <div class="func-head">
+        <div class="func-num">08</div>
+        <div class="func-title">知识库问答</div>
+        <div class="func-desc">上传文档构建专属知识库，检索增强问答（RAG）</div>
+      </div>
+      <div class="shot-grid">
+        <div class="shot-card">
+          <img class="shot-img" src="./img/llm-trace/llm_6.png" alt="知识库上传" onclick="openLightbox(this)">
+          <div class="shot-meta">
+            <span class="shot-tag">kb.html</span>
+            <span class="shot-note">上传 8 个文档 / 10 个切片</span>
+          </div>
+        </div>
+        <div class="shot-card">
+          <img class="shot-img" src="./img/llm-trace/llm_7.png" alt="RAG 问答" onclick="openLightbox(this)">
+          <div class="shot-meta">
+            <span class="shot-tag">kb.html</span>
+            <span class="shot-note">RAG 检索问答 · 片段匹配高亮</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 09 图像识别 -->
+    <section class="func-section">
+      <div class="func-head">
+        <div class="func-num">09</div>
+        <div class="func-title">图像识别</div>
+        <div class="func-desc">上传图片，由七牛云视觉大模型生成图片描述</div>
+      </div>
+      <div class="shot-grid">
+        <div class="shot-card">
+          <img class="shot-img" src="./img/llm-trace/llm_8.png" alt="图像识别" onclick="openLightbox(this)">
+          <div class="shot-meta">
+            <span class="shot-tag">vision.html</span>
+            <span class="shot-note">图片描述 · 识别 5 张功能卡片并总结</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- 放大层 -->
+  <div class="lightbox" id="cyrLightbox" onclick="closeLightbox()">
+    <span class="lightbox-close" onclick="closeLightbox()">✕</span>
+    <img id="cyrLightboxImg" alt="放大查看">
+  </div>
+
+  <script>
+    function openLightbox(imgEl) {
+      var box = document.getElementById('cyrLightbox');
+      var bigImg = document.getElementById('cyrLightboxImg');
+      bigImg.src = imgEl.src;
+      box.classList.add('show');
+    }
+    function closeLightbox() {
+      document.getElementById('cyrLightbox').classList.remove('show');
+    }
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closeLightbox();
+    });
+  </script>
+</body>
+</html>
